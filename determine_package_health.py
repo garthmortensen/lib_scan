@@ -60,7 +60,11 @@ for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
     downloads_conda.append(line)
 downloads_conda = downloads_conda[3:]  # drop header lines
 
-downloaded_libs = downloads_pip + downloads_conda
+# %%
+
+# using conda, so when appropro, default on conda
+# TODO: add param
+downloads_pip = list(set(downloads_pip) - set(downloads_conda))
 
 # %%
 
@@ -80,30 +84,80 @@ for file in os.listdir(dir_scripts):
                 import_line = import_line.strip().lower()
                 script_imports.append(import_line)
 
-script_imports = list(set(script_imports))  # remove dupes from list
+script_imports = list(set(script_imports))  # distinct
 
 # %%
 
-pypi_searches = []
-for import_line in script_imports:
-    if import_line in downloaded_libs:
-        print(f"{import_line} in downloaded_libs. Adding to search list")
-        pypi_searches.append(import_line)
-    if import_line in standard_libs:
-        print(f"{import_line} in standard_libs. No need to check health.")
+pypi_results = []
+homepages = []
+for package in downloads_pip:
+
+    try:
+        url = f"https://pypi.org/pypi/{package}/json"
+        r = requests.get(url)
+        data = r.json()
+    except: print(f"Package not found on pypi: {package}")
+
+    repo_info = {}
+    # Section: header =========================================================
+    repo_info['package'] = f"{package}"
+    repo_info['header'] = f"Info about {package}"
+    
+    # Section: info ===========================================================
+    key_parent = 'info'
+
+    # NB: get() overcomes missing keys. For nested keys, use many gets
+    key_child = 'summary'
+    repo_info[key_child] = data.get(key_parent).get(key_child)
+
+    key_child = 'requires_python'
+    repo_info[key_child] = data.get(key_parent).get(key_child)
+
+    key_child = 'requires_dist'
+    repo_info[key_child] = data.get(key_parent).get(key_child)
+
+    key_child = 'yanked'
+    repo_info[key_child] = data.get(key_parent).get(key_child)
+
+    try:  # if parent is None, error
+        key_child = 'project_urls'
+        key_grandchild = 'Homepage'
+        repo_info[key_grandchild] = data.get(key_parent).get(key_child).get(key_grandchild)
+        homepages.append(repo_info[key_grandchild])
+    except: print(f"pypi call {package} contains missing data on: {key_parent}, {key_child}, {key_grandchild}")
+
+    # Section: releases =======================================================
+    key_parent = 'info'
+    repo_info[key_child] = data.get(key_parent)
+
+    # Section: vulnerabilities ================================================
+    key_parent = 'vulnerabilities'
+    repo_info[key_child] = data.get(key_parent)
+    
+    # Section: urls ===========================================================
+    key_parent = 'urls'
+    repo_info[key_child] = data.get(key_parent)
+ 
+    # api_results['pypi'] = repo_info
+    pypi_results.append(repo_info)
 
 # %%
 
-package = pypi_searches[0]
-url = f"https://pypi.org/pypi/{package}/json"
-r = requests.get(url)
-data = r.json()
+for homepage in homepages:
+    if '://github.com/' in homepage:  # https://github.com/jupyter-widgets/ipywidgets
 
-info = data['info']
-releases = data['releases']
-vulnerabilities = data['vulnerabilities']
-urls = data['urls']
+        # parse page before constructing api query url
+        owner_repo = homepage.split('://github.com/')[1]  # jupyter-widgets/ipywidgets
+        owner = owner_repo.split('/')[0]  # jupyter-widgets
+        repo = owner_repo.split('/')[1]  # ipywidgets
+
+        query_url = f"https://api.github.com/repos/{owner}/{repo}"
+        response = requests.get(query_url)
+        if response.status_code == 200:  # success
+            response_dict = response.json()
+
+
+# %%
 
 
 # https://api.anaconda.org/docs
-
