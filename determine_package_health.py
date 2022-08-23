@@ -53,7 +53,7 @@ def get_local_script_imports(dir_py: str) -> list:
     on the pypi repo.
     """
 
-    dir_scripts = os.path.join(dir_py, "sample_scripts")
+    dir_scripts = os.path.join(dir_py, "input")
 
     script_imports = []
     for file in os.listdir(dir_scripts):
@@ -193,8 +193,6 @@ def pull_github_content(homepage: str) -> dict:
 
     # ensure request succeeds
     if response.status_code == 200:  # success
-        datetime_format = '%Y-%m-%d'  # for dates
-
         github_data = response.json()
     
         key_parent = "api_url_repo"
@@ -286,8 +284,6 @@ def pull_github_content(homepage: str) -> dict:
 def pull_pypi_content(dir_py: str, downloads_pip: list, filename: str) -> list:
     """loop through packages on pypi and pull basic stats"""
 
-    dir_scripts = os.path.join(dir_py, "sample_scripts")
-
     pypi_results = []
     for package in downloads_pip:
 
@@ -351,7 +347,7 @@ def pull_pypi_content(dir_py: str, downloads_pip: list, filename: str) -> list:
         
         file = json.dumps(pypi_results, indent=4)
 
-        with open(os.path.join(dir_scripts, filename + ".json"), "w") as outfile:
+        with open(os.path.join(dir_py, "output", filename + ".json"), "w") as outfile:
             outfile.write(file)
 
     # return pypi_results
@@ -364,9 +360,21 @@ downloads_pip = pull_pypi_content(dir_py, downloads_pip, "downloads_pip")
 
 # %%
 
-# TODO: scrape anaconda
-# https://api.anaconda.org/docs
+# TODO: conda forge?
+# conda contains not just python packages, also r, etc
+# readme files are standardized and contain homepage
+# https://github.com/conda-forge/qtconsole-feedstock#readme
+# Development: https://github.com/jupyter/qtconsole
+
 
 # %%
 
-# TODO: json -> csv
+# TODO: get R package info
+# github.com/cran/package
+
+# %%
+
+# TODO: get stackoverflow info on packages
+# https://api.stackexchange.com/docs/tags-by-name#order=desc&sort=popular&tags=sql&filter=default&site=stackoverflow&run=true
+# https://api.stackexchange.com/2.3/tags/sql/info?order=desc&sort=popular&site=stackoverflow
+
