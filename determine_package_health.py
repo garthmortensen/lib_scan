@@ -37,6 +37,52 @@ github_token = os.getenv("github_token")
 
 # %%
 
+dir_yml = os.path.join(dir_py, "input_yml")
+
+yml_imports = []
+for file in os.listdir(dir_yml):
+    if file.endswith('.yml') or file.endswith('.yaml'):
+        filepath = os.path.join(dir_yml, file)
+        all_lines = open(filepath, "r").readlines()
+
+# %%
+
+yml_dependencies = []
+string_dep_line = all_lines.index("dependencies:\n")  # find where dependencies start
+# string_pip_line = all_lines.index("- pip:\n")  # if you want to remove all pip
+
+for line in all_lines[string_dep_line + 1:]:  # go from there, but exclude dependencies line
+    if "pip:" not in line:
+        dash_space_removed = line.split("- ")[1]
+        version_removed = dash_space_removed.split("=")[0]
+        version_removed = version_removed.strip().lower()
+        yml_dependencies.append(version_removed)
+
+# %%
+
+def get_conda_yml() -> list:
+    """takes in only 1 .yml/.yaml file"""
+    dir_yml = os.path.join(dir_py, "input_yml")
+
+    for file in os.listdir(dir_yml):
+        if file.endswith('.yml') or file.endswith('.yaml'):
+            filepath = os.path.join(dir_yml, file)
+            all_lines = open(filepath, "r").readlines()
+
+
+            yml_dependencies = []
+            string_dep_line = all_lines.index("dependencies:\n")  # find where dependencies start
+            # string_pip_line = all_lines.index("- pip:\n")  # if you want to remove all pip
+        
+            for line in all_lines[string_dep_line + 1:]:  # go from there, but exclude dependencies line
+                if "pip:" not in line:
+                    dash_space_removed = line.split("- ")[1]
+                    version_removed = dash_space_removed.split("=")[0]
+                    version_removed = version_removed.strip().lower()
+                    yml_dependencies.append(version_removed)
+
+    return yml_dependencies
+
 
 def get_local_script_imports(dir_py: str) -> list:
     """
@@ -106,7 +152,7 @@ def get_downloaded_pip_libs() -> list:
     this function determines which libraries were downloaded from pip
     """
     downloads_pip = []
-    proc = subprocess.Popen('pip list', stdout=subprocess.PIPE)
+    proc = subprocess.Popen('pip list', stdout=subprocess.PIPE, shell=True)
     for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
         line = line.split()[0].strip().lower()  # get first column, strip spaces
         downloads_pip.append(line)
@@ -121,7 +167,7 @@ def get_downloaded_conda_libs() -> list:
     this function determines which libraries were downloaded from conda
     """    
     downloads_conda = []
-    proc = subprocess.Popen('conda list', stdout=subprocess.PIPE)
+    proc = subprocess.Popen('conda list', stdout=subprocess.PIPE, shell=True)
     for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
         line = line.split()[0].strip().lower()  # get first column, strip spaces
         downloads_conda.append(line)
@@ -134,6 +180,7 @@ def get_downloaded_conda_libs() -> list:
 # obtain lists of libraries from different sources
 # Ideally, these should be mutually exclusive
 script_imports = get_local_script_imports(dir_py)
+yml_result = get_conda_yml()
 standard_libs = get_standard_libs()  # no health check needed
 downloads_pip = get_downloaded_pip_libs()
 downloads_conda = get_downloaded_conda_libs()
@@ -277,6 +324,9 @@ def pull_github_content(homepage: str) -> dict:
             key_parent = "commits_max_30"
             github_repo_info[f"github_{key_parent}"] = commit_count
 
+    # else:
+        # TODO: handle missing pypi repos
+
     # print(json.dumps(github_repo_info))
     return github_repo_info  # dict
 
@@ -365,7 +415,6 @@ downloads_pip = pull_pypi_content(dir_py, downloads_pip, "downloads_pip")
 # readme files are standardized and contain homepage
 # https://github.com/conda-forge/qtconsole-feedstock#readme
 # Development: https://github.com/jupyter/qtconsole
-
 
 # %%
 
