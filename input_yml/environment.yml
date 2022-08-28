@@ -14,3 +14,9 @@ dependencies:
  - pip:
    - kaggle==1.5
    - yellowbrick==0.9
+something:
+  - something else 1
+  - something else 2
+again:
+  - testing
+

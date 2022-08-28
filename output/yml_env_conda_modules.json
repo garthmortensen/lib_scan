@@ -1,0 +1,118 @@
+[
+    {
+        "condaforge_api_url_repo": "https://raw.githubusercontent.com/conda-forge/scikit-learn-feedstock/main/README.md",
+        "github_api_pull": {
+            "github_api_url_repo": "https://api.github.com/repos/scikit-learn/scikit-learn",
+            "github_api_status": "success",
+            "github_package": "scikit-learn",
+            "github_header": "Info about scikit-learn",
+            "github_description": "scikit-learn: machine learning in Python",
+            "github_created_at": "2010-08-17T09:43:38Z",
+            "github_created_at_delta": "4394 days, 0:00:00 days",
+            "github_updated_at": "2022-08-28T11:24:42Z",
+            "github_updated_at_delta": "0:00:00 days",
+            "github_subscribers_count": 2179,
+            "github_stargazers_count": 51195,
+            "github_has_issues": true,
+            "github_open_issues_count": 2186,
+            "github_open_issues": 2186,
+            "github_has_projects": true,
+            "github_has_downloads": true,
+            "github_has_wiki": true,
+            "github_allow_forking": true,
+            "github_fork": false,
+            "github_forks_count": 23356,
+            "github_forks": 23356,
+            "github_commits_max_30": 30
+        }
+    },
+    {
+        "condaforge_api_url_repo": "https://raw.githubusercontent.com/conda-forge/ipython-feedstock/main/README.md",
+        "github_api_pull": {
+            "github_api_url_repo": "https://api.github.com/repos/ipython/ipython",
+            "github_api_status": "success",
+            "github_package": "ipython",
+            "github_header": "Info about ipython",
+            "github_description": "Official repository for IPython itself. Other repos in the IPython organization contain things like the website, documentation builds, etc.",
+            "github_created_at": "2010-05-10T04:46:06Z",
+            "github_created_at_delta": "4493 days, 0:00:00 days",
+            "github_updated_at": "2022-08-27T03:18:39Z",
+            "github_updated_at_delta": "1 day, 0:00:00 days",
+            "github_subscribers_count": 773,
+            "github_stargazers_count": 15480,
+            "github_has_issues": true,
+            "github_open_issues_count": 1533,
+            "github_open_issues": 1533,
+            "github_has_projects": true,
+            "github_has_downloads": true,
+            "github_has_wiki": true,
+            "github_allow_forking": true,
+            "github_fork": false,
+            "github_forks_count": 4364,
+            "github_forks": 4364,
+            "github_commits_max_30": 30
+        }
+    },
+    {
+        "condaforge_api_url_repo": "https://raw.githubusercontent.com/conda-forge/pip-feedstock/main/README.md",
+        "github_api_pull": {
+            "github_api_url_repo": "https://api.github.com/repos/pypa/pip",
+            "github_api_status": "success",
+            "github_package": "pip",
+            "github_header": "Info about pip",
+            "github_description": "The Python package installer",
+            "github_created_at": "2011-03-06T14:30:46Z",
+            "github_created_at_delta": "4193 days, 0:00:00 days",
+            "github_updated_at": "2022-08-28T15:09:46Z",
+            "github_updated_at_delta": "0:00:00 days",
+            "github_subscribers_count": 300,
+            "github_stargazers_count": 8218,
+            "github_has_issues": true,
+            "github_open_issues_count": 1008,
+            "github_open_issues": 1008,
+            "github_has_projects": true,
+            "github_has_downloads": true,
+            "github_has_wiki": false,
+            "github_allow_forking": true,
+            "github_fork": false,
+            "github_forks_count": 2691,
+            "github_forks": 2691,
+            "github_commits_max_30": 30
+        }
+    },
+    {
+        "condaforge_api_url_repo": "https://raw.githubusercontent.com/conda-forge/matplotlib-feedstock/main/README.md",
+        "github_api_pull": {
+            "github_api_url_repo": "https://api.github.com/repos/matplotlib/matplotlib",
+            "github_api_status": "success",
+            "github_package": "matplotlib",
+            "github_header": "Info about matplotlib",
+            "github_description": "matplotlib: plotting with Python",
+            "github_created_at": "2011-02-19T03:17:12Z",
+            "github_created_at_delta": "4208 days, 0:00:00 days",
+            "github_updated_at": "2022-08-28T15:57:45Z",
+            "github_updated_at_delta": "0:00:00 days",
+            "github_subscribers_count": 582,
+            "github_stargazers_count": 16025,
+            "github_has_issues": true,
+            "github_open_issues_count": 1835,
+            "github_open_issues": 1835,
+            "github_has_projects": true,
+            "github_has_downloads": true,
+            "github_has_wiki": true,
+            "github_allow_forking": true,
+            "github_fork": false,
+            "github_forks_count": 6466,
+            "github_forks": 6466,
+            "github_commits_max_30": 30
+        }
+    },
+    {
+        "condaforge_api_url_repo": "https://raw.githubusercontent.com/conda-forge/pandas-feedstock/main/README.md",
+        "github_api_pull": "development site not listed."
+    },
+    {
+        "condaforge_api_url_repo": "https://raw.githubusercontent.com/conda-forge/python-feedstock/main/README.md",
+        "github_api_pull": "development site not listed."
+    }
+]
