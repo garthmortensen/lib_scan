@@ -13,13 +13,16 @@ To see what the API calls look like, load up Postman and get:
     github api: https://api.github.com/repos/jupyter-widgets/ipywidgets
 """
 
+# TODO: rename "lib/library" references to "package".
+
 import requests
 import os
 import subprocess
 import io
 import sys
 import json
-from datetime import datetime
+from datetime import datetime  # for delta days
+import urllib.request  # parse readme
 
 # load github token to overcome api limit
 from dotenv import load_dotenv  # pip install python-dotenv
@@ -37,30 +40,8 @@ github_token = os.getenv("github_token")
 
 # %%
 
-dir_yml = os.path.join(dir_py, "input_yml")
-
-yml_imports = []
-for file in os.listdir(dir_yml):
-    if file.endswith('.yml') or file.endswith('.yaml'):
-        filepath = os.path.join(dir_yml, file)
-        all_lines = open(filepath, "r").readlines()
-
-# %%
-
-yml_dependencies = []
-string_dep_line = all_lines.index("dependencies:\n")  # find where dependencies start
-# string_pip_line = all_lines.index("- pip:\n")  # if you want to remove all pip
-
-for line in all_lines[string_dep_line + 1:]:  # go from there, but exclude dependencies line
-    if "pip:" not in line:
-        dash_space_removed = line.split("- ")[1]
-        version_removed = dash_space_removed.split("=")[0]
-        version_removed = version_removed.strip().lower()
-        yml_dependencies.append(version_removed)
-
-# %%
-
-def get_conda_yml() -> list:
+# TODO: handle subsequent headers, otherwise error
+def get_yml_libs() -> list:
     """takes in only 1 .yml/.yaml file"""
     dir_yml = os.path.join(dir_py, "input_yml")
 
@@ -69,8 +50,7 @@ def get_conda_yml() -> list:
             filepath = os.path.join(dir_yml, file)
             all_lines = open(filepath, "r").readlines()
 
-
-            yml_dependencies = []
+            yml_env_libraries = []
             string_dep_line = all_lines.index("dependencies:\n")  # find where dependencies start
             # string_pip_line = all_lines.index("- pip:\n")  # if you want to remove all pip
         
@@ -79,12 +59,12 @@ def get_conda_yml() -> list:
                     dash_space_removed = line.split("- ")[1]
                     version_removed = dash_space_removed.split("=")[0]
                     version_removed = version_removed.strip().lower()
-                    yml_dependencies.append(version_removed)
+                    yml_env_libraries.append(version_removed)
 
-    return yml_dependencies
+    return yml_env_libraries
 
 
-def get_local_script_imports(dir_py: str) -> list:
+def get_script_libs(dir_py: str) -> list:
     """
     Input: string directory of where your working project scripts are.
     Output: list of imported modules in project scripts.
@@ -101,7 +81,7 @@ def get_local_script_imports(dir_py: str) -> list:
 
     dir_scripts = os.path.join(dir_py, "input")
 
-    script_imports = []
+    script_libs = []
     for file in os.listdir(dir_scripts):
         if file.endswith('.py'):
             filepath = os.path.join(dir_scripts, file)
@@ -111,9 +91,9 @@ def get_local_script_imports(dir_py: str) -> list:
                 if 'import' in line:
                     import_line = line.split(' ')[1]
                     import_line = import_line.strip().lower()
-                    script_imports.append(import_line)
+                    script_libs.append(import_line)
     
-    return list(set(script_imports))  # distinct
+    return list(set(script_libs))  # distinct
 
 
 def get_standard_libs() -> list:
@@ -124,17 +104,7 @@ def get_standard_libs() -> list:
     Description:
     get list of all standard libraries.
 
-    standardlibrary = dont need to download, but need to import
-    things that automatically come with python when you download it
-    but these all take a lot space, so these are not automatically loaded
-
-    builtins = dont need to import
-    these are all automatically loaded. No need to import them.
-    you dont need to `import print`
-    print(dir(__builtins__))
-    builtins are irrelevant to this script.
-
-    Consider excluding standard_libs from results,
+    You may decide to exclude standard_libs from results,
     since theyre not on pypi or conda repos
     """
 
@@ -146,58 +116,58 @@ def get_standard_libs() -> list:
     return standard_libs
 
 
-def get_downloaded_pip_libs() -> list:
+def get_pip_list_libs() -> list:
     """pip installs source from pypi repo, and out of the box
     are not installed or imported, so must be downloaded and imported
     this function determines which libraries were downloaded from pip
     """
-    downloads_pip = []
+    pip_list_libs = []
     proc = subprocess.Popen('pip list', stdout=subprocess.PIPE, shell=True)
     for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
         line = line.split()[0].strip().lower()  # get first column, strip spaces
-        downloads_pip.append(line)
+        pip_list_libs.append(line)
     
-    return downloads_pip[2:]  # drop header lines
+    return pip_list_libs[2:]  # drop header lines
 
 
-def get_downloaded_conda_libs() -> list:
+def get_conda_list_libs() -> list:
     # TODO: if not conda user, this might error
     """conda installs source from Anaconda repo, and out of the box
     are not installed or imported, so must be downloaded and imported
     this function determines which libraries were downloaded from conda
     """    
-    downloads_conda = []
+    conda_list_libs = []
     proc = subprocess.Popen('conda list', stdout=subprocess.PIPE, shell=True)
     for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
         line = line.split()[0].strip().lower()  # get first column, strip spaces
-        downloads_conda.append(line)
+        conda_list_libs.append(line)
 
-    return downloads_conda[3:]  # drop header lines
+    return conda_list_libs[3:]  # drop header lines
 
 
 # %%
 
 # obtain lists of libraries from different sources
 # Ideally, these should be mutually exclusive
-script_imports = get_local_script_imports(dir_py)
-yml_result = get_conda_yml()
+script_libs = get_script_libs(dir_py)
+yml_libs = get_yml_libs()
 standard_libs = get_standard_libs()  # no health check needed
-downloads_pip = get_downloaded_pip_libs()
-downloads_conda = get_downloaded_conda_libs()
+pip_list_libs = get_pip_list_libs()
+conda_list_libs = get_conda_list_libs()
 
 # remove standard libs from scripts
 # checking on scripts_imports is the main objective
-script_imports = list(set(script_imports) - set(standard_libs))
+script_libs = list(set(script_libs) - set(standard_libs))
 
 # optional check: pypi has API, but not conda, so lookup using pip
-downloads_pip = list(set(downloads_pip) - set(downloads_conda))
+pip_list_libs = list(set(pip_list_libs) - set(conda_list_libs))
 
 # optional check: find leftover conda libraries
-downloads_conda = list(set(downloads_conda) - set(downloads_pip))
+conda_list_libs = list(set(conda_list_libs) - set(pip_list_libs))
 
-print(f"length of script_imports: {len(script_imports)}")
-print(f"length of downloads_pip: {len(downloads_pip)}")
-print(f"length of downloads_conda: {len(downloads_conda)}")
+print(f"length of script_libs: {len(script_libs)}")
+print(f"length of pip_list_libs: {len(pip_list_libs)}")
+print(f"length of conda_list_libs: {len(conda_list_libs)}")
 
 # %%
 
@@ -222,6 +192,7 @@ def pull_github_content(homepage: str) -> dict:
     not available at pypi/conda repos.
     Input: 
         https://api.github.com/repos/{owner}/{repo}
+        e.g. https://github.com/jupyter-widgets/ipywidgets
         github username
         github API token
     Output: dict of repo stats
@@ -238,12 +209,17 @@ def pull_github_content(homepage: str) -> dict:
     # loop through json elements and populate dict
     github_repo_info = {}
 
+    key_parent = "api_url_repo"
+    github_repo_info[f"github_{key_parent}"] = query_url
+
     # ensure request succeeds
-    if response.status_code == 200:  # success
+    if response.status_code != 200:  #  request failed
+        github_repo_info['github_api_status'] = "fail"
+    
+    else:   # request succeeded
         github_data = response.json()
     
-        key_parent = "api_url_repo"
-        github_repo_info[f"github_{key_parent}"] = query_url
+        github_repo_info['github_api_status'] = "success"
 
         # json section: header ================================================
         github_repo_info['github_package'] = f"{repo}"
@@ -305,8 +281,7 @@ def pull_github_content(homepage: str) -> dict:
         key_parent = "forks"  # repeat?
         github_repo_info[f"github_{key_parent}"] = github_data.get(key_parent)
         
-        # get the total count of commits from commits endpoint
-        # API limits commit count return to 30
+        # request count(commits). Limit set to 30 max
         query_url = f"https://api.github.com/repos/{owner}/{repo}/commits"
         response = requests.get(query_url, auth=(github_user, github_token))
         if response.status_code == 200:  # success
@@ -318,82 +293,131 @@ def pull_github_content(homepage: str) -> dict:
                     if k == "commit":
                         commit_count += 1
 
-            # key_parent = "api_url_commit"
-            # github_repo_info[key_parent] = query_url
-
             key_parent = "commits_max_30"
             github_repo_info[f"github_{key_parent}"] = commit_count
 
-    # else:
-        # TODO: handle missing pypi repos
-
     # print(json.dumps(github_repo_info))
-    return github_repo_info  # dict
+    return github_repo_info
 
 
-def pull_pypi_content(dir_py: str, downloads_pip: list, filename: str) -> list:
+def pull_stackoverflow_content(package: str) -> dict:
+    """Pull library tag stats using Stackoverflow API, on main SO site.
+    Tag should be the package name.
+    Limit is 300 requests/day. OAuth registration requires domain.
+
+    https://api.stackexchange.com/2.3/tags/{tag}/info?site=stackoverflow
+    https://stackoverflow.com/questions/tagged/{tag}
+
+    Input: library name as string
+    Output: dict
+    """
+
+    tag = package  # search SO for package name as tag
+    query_url = f"https://api.stackexchange.com/2.3/tags/{tag}/info?order=desc&sort=popular&site=stackoverflow"
+    response = requests.get(query_url)
+    
+    stackoverflow_results = []
+    
+    tag_info = {}
+    # json section: header ================================================
+    tag_info['stackoverflow_tag'] = f"{tag}"
+    tag_info['stackoverflow_header'] = f"Info about {tag}"
+    
+    # ensure request succeeds
+    if response.status_code != 200:  #  request failed
+        tag_info['stackoverflow_api_status'] = "fail"
+    
+    else:   # request succeeded
+        try:
+            data = response.json()
+            data = data['items'][0]  # items contains a list of length 1!
+            tag_info['stackoverflow_api_status'] = "success"
+            
+            key_parent = 'name'
+            tag_info[f"stackoverflow_{key_parent}"] = data.get(key_parent)
+            
+            key_parent = 'has_synonyms'
+            tag_info[f"stackoverflow_{key_parent}"] = data.get(key_parent)
+            
+            key_parent = 'count'
+            tag_info[f"stackoverflow_{key_parent}"] = data.get(key_parent)
+            
+            stackoverflow_results.append(tag_info)
+
+        except IndexError:
+            tag_info['stackoverflow_api_status'] = "tag returned no results"
+    
+    return stackoverflow_results
+
+
+def pull_pypi_content(dir_py: str, pip_list_libs: list, filename: str) -> list:
     """loop through packages on pypi and pull basic stats"""
 
     pypi_results = []
-    for package in downloads_pip:
+    for package in pip_list_libs:
 
         query_url = f"https://pypi.org/pypi/{package}/json"
         response = requests.get(query_url)
-        
-        # ensure request succeeds
-        if response.status_code == 200:
-            data = response.json()
-    
+
         repo_info = {}
         # json section: header ================================================
         repo_info['pypi_package'] = f"{package}"
         repo_info['pypi_header'] = f"Info about {package}"
         
-        # json section: info ==================================================
-        key_parent = 'info'
-    
-        # Note: get() overcomes missing keys. For nested keys, use many gets
-        key_child = 'summary'
-        repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
-    
-        key_child = 'requires_python'
-        repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
-    
-        key_child = 'requires_dist'
-        # repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
-        repo_info[f"pypi_{key_parent}_{key_child}"] = str(data.get(key_parent).get(key_child))  # formatting variation
-    
-        key_child = 'yanked'
-        repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
-        
-        # json section: releases ==============================================
-        # key_parent = 'releases'
-        # repo_info[f"pypi_{key_parent}"] = data.get(key_parent)
-    
-        # json section: vulnerabilities =======================================
-        key_parent = 'vulnerabilities'
-        repo_info[f"pypi_{key_parent}"] = data.get(key_parent)
-        
-        # json section: info github============================================
-        key_parent = 'info'
+        # ensure request succeeds
+        if response.status_code != 200:  #  request failed
+            repo_info['pypi_api_status'] = "fail"
 
-        try:  # if parent is None, error
-            key_child = 'project_urls'
-            key_grandchild = 'Homepage'
+        else:   # request succeeded
+            data = response.json()
 
-            # json section: github=============================================
-            # repeating the assignment, but homepage is cleaner syntax to parse
-            homepage = data.get(key_parent).get(key_child).get(key_grandchild)
-            if '://github.com/' in homepage:  # https://github.com/jupyter-widgets/ipywidgets
-                github_api_call = pull_github_content(homepage)
-                repo_info['github_api_pull'] = github_api_call
-            else:
-                repo_info['github_api_pull'] = "Not a Github homepage."
-
-        except: print(f"pypi call {package} contains missing data on: {key_parent}, {key_child}, {key_grandchild}")
+            repo_info['pypi_api_status'] = "success"
+            
+            # json section: info ==================================================
+            key_parent = 'info'
         
-        # api_results['pypi'] = repo_info
-        pypi_results.append(repo_info)
+            # Note: get() overcomes missing keys. For nested keys, use many gets
+            key_child = 'summary'
+            repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
+        
+            key_child = 'requires_python'
+            repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
+        
+            key_child = 'requires_dist'
+            # repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
+            repo_info[f"pypi_{key_parent}_{key_child}"] = str(data.get(key_parent).get(key_child))  # formatting variation
+        
+            key_child = 'yanked'
+            repo_info[f"pypi_{key_parent}_{key_child}"] = data.get(key_parent).get(key_child)
+            
+            # json section: vulnerabilities =======================================
+            key_parent = 'vulnerabilities'
+            repo_info[f"pypi_{key_parent}"] = data.get(key_parent)
+            
+            # json section: info github============================================
+            key_parent = 'info'
+    
+            try:  # if parent is None, error
+                key_child = 'project_urls'
+                key_grandchild = 'Homepage'
+    
+                # json section: github=============================================
+                homepage = data.get(key_parent).get(key_child).get(key_grandchild)
+                if '://github.com/' in homepage:  
+                    github_api_call = pull_github_content(homepage)
+                    repo_info['github_api_pull'] = github_api_call
+                else:
+                    repo_info['github_api_pull'] = "Github dev site not found."
+    
+            except: 
+                print(f"pypi call {package} contains missing data on: {key_parent}, {key_child}, {key_grandchild}")
+
+
+            # json section: stackoverflow======================================
+            stackoverflow_api_call = pull_stackoverflow_content(package)
+            repo_info['stackoverflow_api_call'] = stackoverflow_api_call
+
+            pypi_results.append(repo_info)
         
         file = json.dumps(pypi_results, indent=4)
 
@@ -404,26 +428,45 @@ def pull_pypi_content(dir_py: str, downloads_pip: list, filename: str) -> list:
     return json.dumps(pypi_results, indent=4)
 
 
+# %%
+
+
 # run the searches
-pypi_results_script = pull_pypi_content(dir_py, script_imports, "pypi_results_script")
-downloads_pip = pull_pypi_content(dir_py, downloads_pip, "downloads_pip")
+script_libs_results = pull_pypi_content(dir_py, script_libs, "script_libs")
+# pip_list_libs_results = pull_pypi_content(dir_py, pip_list_libs, "pip_list_libs")
 
 # %%
 
-# TODO: conda forge?
-# conda contains not just python packages, also r, etc
-# readme files are standardized and contain homepage
-# https://github.com/conda-forge/qtconsole-feedstock#readme
-# Development: https://github.com/jupyter/qtconsole
+pull_condaforge_content(library):
+# https://raw.githubusercontent.com/conda-forge/qtconsole-feedstock/main/README.md
+package = "qtconsole"
+query_url = f"https://raw.githubusercontent.com/conda-forge/{package}-feedstock/main/README.md"
+
+condaforge_repo_info = {}
+
+key_parent = "api_url_repo"
+condaforge_repo_info[f"condaforge_{key_parent}"] = query_url
+
+response = requests.get(query_url, stream=True)  # stream until website found
+
+# ensure request succeeds
+if response.status_code != 200:  #  request failed
+    condaforge_repo_info['github_api_status'] = "fail"
+
+else:   # request succeeded
+    # iterate through readme.md lines, stop early when the "dev:" found
+    for line in response.iter_lines():
+        if 'development:' in str(line).lower():
+            dev_line = str(line)
+            homepage = dev_line.split(' ')[1].strip()
+            exit
+
+        # json section: github=================================================
+        github_api_call = pull_github_content(homepage)
+        condaforge_repo_info['github_api_pull'] = github_api_call
+        
 
 # %%
 
 # TODO: get R package info
 # github.com/cran/package
-
-# %%
-
-# TODO: get stackoverflow info on packages
-# https://api.stackexchange.com/docs/tags-by-name#order=desc&sort=popular&tags=sql&filter=default&site=stackoverflow&run=true
-# https://api.stackexchange.com/2.3/tags/sql/info?order=desc&sort=popular&site=stackoverflow
-
