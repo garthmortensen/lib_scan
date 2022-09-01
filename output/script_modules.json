@@ -32,16 +32,7 @@
             "github_forks": 5,
             "github_commits_max_30": 30
         },
-        "stackoverflow_api_call": [
-            {
-                "stackoverflow_tag": "db",
-                "stackoverflow_header": "Info about db",
-                "stackoverflow_api_status": "success",
-                "stackoverflow_name": "database",
-                "stackoverflow_has_synonyms": true,
-                "stackoverflow_count": 188820
-            }
-        ]
+        "stackoverflow_api_call": []
     },
     {
         "pypi_package": "sqlalchemy",
@@ -53,15 +44,6 @@
         "pypi_info_yanked": false,
         "pypi_vulnerabilities": [],
         "github_api_pull": "Github dev site not listed.",
-        "stackoverflow_api_call": [
-            {
-                "stackoverflow_tag": "sqlalchemy",
-                "stackoverflow_header": "Info about sqlalchemy",
-                "stackoverflow_api_status": "success",
-                "stackoverflow_name": "sqlalchemy",
-                "stackoverflow_has_synonyms": false,
-                "stackoverflow_count": 21225
-            }
-        ]
+        "stackoverflow_api_call": []
     }
 ]

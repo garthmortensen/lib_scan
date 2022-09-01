@@ -20,7 +20,7 @@ import io
 import sys
 import json
 from datetime import datetime  # for delta days
-import fnmatch  # parse yml
+import yaml
 
 # load github token to overcome api limit
 from pathlib import Path
@@ -57,6 +57,7 @@ github_user, github_token = token_in_env(True)
 
 # %%
 
+
 def get_standard_libraries():
     """
     Output:
@@ -88,76 +89,6 @@ standard_libs = get_standard_libraries()  # prolly exclude this from subsequent 
 
 # %%
 
-
-def get_yml_modules(remove_standard_libs=False) -> list:
-    """reads a single yml file in directory
-    returns list of conda dependencies and pip dependencies
-    Input: set whether you want to remove standard libraries. This would
-    be a good idea if standard libraries are not working (perhaps linux)
-    """
-    
-    dir_yml = os.path.join(dir_py, "input_yml")
-
-    # loop will parse all files, but return only last file
-    for file in os.listdir(dir_yml):
-        if file.endswith('.yml') or file.endswith('.yaml'):
-            filepath = os.path.join(dir_yml, file)
-            all_lines = open(filepath, "r").readlines()
-
-            yml_env_conda_modules = []
-            yml_env_pip_modules = []
-
-            # find start of conda and pip dependencies. Convert from list
-            start_conda_dep = fnmatch.filter(all_lines, "*dependencies:*")[0]
-            start_pip_dep = fnmatch.filter(all_lines, "*pip:*")[0]
-
-            try:
-                start_conda_dep_int = all_lines.index(start_conda_dep)
-                start_pip_dep_int = all_lines.index(start_pip_dep)
-
-                # scan from dependencies: to pip:
-                for line in all_lines[start_conda_dep_int + 1: start_pip_dep_int]:  # go from there, but exclude dependencies line
-                        try:
-                            # parse line for package name
-                            dash_space_removed = line.split("- ")[1]
-                            # the following line handles <= >= ==
-                            version_removed = dash_space_removed.split("=")[0]
-                            version_removed = version_removed.strip().lower()
-                            yml_env_conda_modules.append(version_removed)
-
-                        except IndexError:
-                            print("Index error perhaps due to comment or wheel url in yml conda dependencies.")
-
-                # scan after pip:
-                for line in all_lines[start_pip_dep_int + 1:]:  # go from there, but exclude dependencies line
-                    if ":" in line:  # stop at next header
-                        break
-                    else:
-                        # parse line for package name
-                        try:
-                            dash_space_removed = line.split("- ")[1]
-                            # the following line handles <= >= ==
-                            version_removed = dash_space_removed.split("=")[0]
-                            version_removed = version_removed.strip().lower()
-                            yml_env_pip_modules.append(version_removed)
-                        except IndexError:
-                            print("Index error perhaps due to comment or wheel url in yml pip dependencies.")
-
-            except IndexError:
-                print("yml might not contain dependencies.")
-    
-    # Not sure if standard libs are every in yml dependencies, but leaving as option
-    if remove_standard_libs:
-        yml_env_conda_modules = list(set(yml_env_conda_modules) - set(get_standard_libraries()))
-        yml_env_pip_modules = list(set(yml_env_pip_modules) - set(get_standard_libraries()))
-
-    return {"yml_env_conda_modules": yml_env_conda_modules, 
-            "yml_env_pip_modules": yml_env_pip_modules}
-
-yml_env_modules = get_yml_modules(False)
-
-
-# %%
 
 def get_script_modules(dir_py, remove_standard_libs=False):
     """
@@ -196,6 +127,49 @@ def get_script_modules(dir_py, remove_standard_libs=False):
         script_modules = list(set(script_modules) - set(get_standard_libraries()))
 
     return script_modules
+
+# %%
+
+
+def get_yml_modules(remove_standard_libs=False) -> list:
+    """reads yml/yaml conda environment files in a directory,
+    and returns a distinct list of conda and pip dependencies.
+    Input: Specify if standard libraries should be removed. 
+    """
+
+    dir_yml = os.path.join(dir_py, "input_yml")
+    
+    dependencies_conda = []
+    dependencies_pip = []
+    for file in os.listdir(dir_yml):
+        if file.endswith('.yml') or file.endswith('.yaml'):
+            filepath = os.path.join(dir_yml, file)
+            with open(filepath, "r") as stream:
+                yml_file = yaml.safe_load(stream)  # safe cannot execute code
+    
+                # drill down into 'dependencies' yml block
+                dependencies = yml_file['dependencies']
+                for module in dependencies:
+                    # each module is a string in this list
+                    if isinstance(module, str):
+                        dependencies_conda.append(module)
+                    # pip dependencies, are a nested dict
+                    # this contains single element list, so drill down again
+                    # then iterate through pip dependency list
+                    if isinstance(module, dict) and 'pip' in module.keys():
+                        for pip_module in module['pip']:
+                            dependencies_pip.append(pip_module)
+
+    # Not sure if standard libs are every in yml dependencies, but leaving as option
+    if remove_standard_libs:
+        dependencies_conda = list(set(dependencies_conda) - set(get_standard_libraries()))
+        dependencies_pip = list(set(dependencies_pip) - set(get_standard_libraries()))
+
+    return {"yml_dependencies_conda": dependencies_conda, 
+            "yml_dependencies_pip": dependencies_pip}
+
+
+# %%
 
 
 def get_pip_list_modules(remove_standard_libs=False) -> list:
@@ -248,9 +222,9 @@ def get_conda_list_modules(remove_standard_libs=False) -> list:
 
 # Ideally, these should be mutually exclusive
 local_script_modules = get_script_modules(dir_py, remove_standard_libs=True)
-pip_list_modules = get_pip_list_modules()  # $ pip list
-conda_list_modules = get_conda_list_modules()  # $ conda list
-yml_env_conda_modules, yml_env_pip_modules = get_yml_modules(True)  # yml content
+yml_env_modules = get_yml_modules(remove_standard_libs=True)
+pip_list_modules = get_pip_list_modules(remove_standard_libs=True)  # $ pip list
+conda_list_modules = get_conda_list_modules(remove_standard_libs=True)  # $ conda list
 
 # %%
 

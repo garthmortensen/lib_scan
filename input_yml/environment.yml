@@ -1,9 +1,7 @@
 name: demo-env
-
 channels:
   - something
   - defaults
-
 dependencies:
   - ipython=7.13
   - matplotlib=3.1
@@ -11,12 +9,11 @@ dependencies:
   - python=3.6
   - scikit-learn=0.22
   - pip=20.0
- - pip:
-   - kaggle==1.5
-   - yellowbrick==0.9
+  - pip:
+    - kaggle==1.5
+    - yellowbrick==0.9
 something:
   - something else 1
   - something else 2
 again:
   - testing
-
