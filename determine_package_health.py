@@ -13,7 +13,6 @@ To see what the API calls look like, load up Postman and get:
     github api: https://api.github.com/repos/jupyter-widgets/ipywidgets
 """
 
-# TODO: rename "lib/library" references to "package".
 
 import requests
 import os
@@ -28,6 +27,7 @@ import fnmatch  # parse yml
 from pathlib import Path
 
 # set working path
+# TODO: provide linux solution
 dir_py = os.path.dirname(__file__)
 os.chdir(dir_py)  # change working path
 
@@ -65,21 +65,28 @@ def get_standard_libraries():
     list of standard library names found in Lib dir.
 
     Description:
-    get list of all standard libraries.
+    get list of all standard libraries. If code fails, it provides the
+    hardcoded standard library for python version 3.9..7
 
     You may decide to exclude standard_modules from results,
     since theyre not on pypi or conda repos
     """
 
-    standard_libraries = []
-    standard_lib_path = os.path.join(sys.prefix, "Lib")
-    for file in os.listdir(standard_lib_path):
-        standard_libraries.append(file.split(".py")[0].strip().lower())
+    try:
+        # start list with python version
+        standard_libraries = []
+        standard_libraries.append(sys.version)    
+        standard_lib_path = os.path.join(sys.prefix, "Lib")
+        for file in os.listdir(standard_lib_path):
+            standard_libraries.append(file.split(".py")[0].strip().lower())
+        
+    except:  # still working on linux functionality
+        standard_libraries = ["3.9.7 (default, Sep 16 2021, 16:59:28) [MSC v.1916 64 bit (AMD64)]", "abc", "aifc", "antigravity", "argparse", "ast", "asynchat", "asyncio", "asyncore", "base64", "bdb", "binhex", "bisect", "bz2", "calendar", "cgi", "cgitb", "chunk", "cmd", "code", "codecs", "codeop", "collections", "colorsys", "compileall", "concurrent", "configparser", "contextlib", "contextvars", "copy", "copyreg", "cprofile", "crypt", "csv", "ctypes", "curses", "dataclasses", "datetime", "dbm", "decimal", "difflib", "dis", "distutils", "doctest", "email", "encodings", "ensurepip", "enum", "filecmp", "fileinput", "fnmatch", "formatter", "fractions", "ftplib", "functools", "genericpath", "getopt", "getpass", "gettext", "glob", "graphlib", "gzip", "hashlib", "heapq", "hmac", "html", "http", "idlelib", "imaplib", "imghdr", "imp", "importlib", "inspect", "io", "ipaddress", "json", "keyword", "lib2to3", "linecache", "locale", "logging", "lzma", "mailbox", "mailcap", "mimetypes", "modulefinder", "msilib", "multiprocessing", "netrc", "nntplib", "ntpath", "nturl2path", "numbers", "opcode", "operator", "optparse", "os", "pathlib", "pdb", "pickle", "pickletools", "pipes", "pkgutil", "platform", "plistlib", "poplib", "posixpath", "pprint", "profile", "pstats", "pty", "pyclbr", "pydoc", "pydoc_data", "py_compile", "queue", "quopri", "random", "re", "reprlib", "rlcompleter", "runpy", "sched", "secrets", "selectors", "shelve", "shlex", "shutil", "signal", "site-packages", "site", "smtpd", "smtplib", "sndhdr", "socket", "socketserver", "sqlite3", "sre_compile", "sre_constants", "sre_parse", "ssl", "stat", "statistics", "string", "stringprep", "struct", "subprocess", "sunau", "symbol", "symtable", "sysconfig", "tabnanny", "tarfile", "telnetlib", "tempfile", "test", "textwrap", "this", "threading", "timeit", "tkinter", "token", "tokenize", "trace", "traceback", "tracemalloc", "tty", "turtle", "turtledemo", "types", "typing", "unittest", "urllib", "uu", "uuid", "venv", "warnings", "wave", "weakref", "webbrowser", "wsgiref", "xdrlib", "xml", "xmlrpc", "zipapp", "zipfile", "zipimport", "zoneinfo", "_aix_support", "_bootlocale", "_bootsubprocess", "_collections_abc", "_compat_pickle", "_compression", "_markupbase", "_nsis", "_osx_support", "_pydecimal", "_pyio", "_py_abc", "_sitebuiltins", "_strptime", "_system_path", "_threading_local", "_weakrefset", "__future__", "__phello__.foo", "__pycache__", ]
 
     return standard_libraries
 
 
-# standard_libs = get_standard_libraries()  # prolly exclude this from subsequent lists
+standard_libs = get_standard_libraries()  # prolly exclude this from subsequent lists
 
 # %%
 
@@ -154,7 +161,7 @@ yml_env_modules = get_yml_modules(False)
 
 # %%
 
-def get_script_modules(dir_py: str) -> list:
+def get_script_modules(dir_py, remove_standard_libs=False):
     """
     Input: string directory of where your working project modules are.
     Output: list of `import yxz` modules.
@@ -165,7 +172,10 @@ def get_script_modules(dir_py: str) -> list:
         `from sqlalchemy import Table`
         `from sqlalchemy import *`
 
-    Note: If you import a personally made module, there may be a false API matches
+    Optional: remove standard library modules from results.
+
+    Note: If you import a personally made module (e.g. `import db`), 
+    there may be a false positives in the API call results.
     """
 
     dir_scripts = os.path.join(dir_py, "input_py")
@@ -182,13 +192,20 @@ def get_script_modules(dir_py: str) -> list:
                     import_line = import_line.strip().lower()
                     script_modules.append(import_line)
 
-    return list(set(script_modules))  # distinct
+    script_modules = list(set(script_modules))
+
+    if remove_standard_libs:
+        script_modules = list(set(script_modules) - set(get_standard_libraries()))
+
+    return script_modules
 
 
 def get_pip_list_modules(remove_standard_libs=False) -> list:
     """pip installs source from pypi repo, and out of the box
     are not installed or imported, so must be downloaded and imported
     this function determines which libraries were downloaded from pip
+    
+    Optional: remove standard library modules from results.
     """
     pip_list_modules = []
     proc = subprocess.Popen('pip list', stdout=subprocess.PIPE, shell=True)
@@ -197,6 +214,7 @@ def get_pip_list_modules(remove_standard_libs=False) -> list:
         pip_list_modules.append(line)
 
     pip_list_modules = pip_list_modules[2:]  # drop header lines
+    pip_list_modules = list(set(pip_list_modules))
 
     # Not sure if standard libs are every in yml dependencies, but leaving as option
     if remove_standard_libs:
@@ -209,6 +227,8 @@ def get_conda_list_modules(remove_standard_libs=False) -> list:
     """conda installs source from Anaconda repo, and out of the box
     are not installed or imported, so must be downloaded and imported
     this function determines which libraries were downloaded from conda
+
+    Optional: remove standard library modules from results.
     """
     conda_list_modules = []
     proc = subprocess.Popen('conda list', stdout=subprocess.PIPE, shell=True)
@@ -217,43 +237,25 @@ def get_conda_list_modules(remove_standard_libs=False) -> list:
         conda_list_modules.append(line)
 
     conda_list_modules = conda_list_modules[3:]  # drop header lines
+    conda_list_modules = list(set(conda_list_modules))
 
     # Not sure if standard libs are every in yml dependencies, but leaving as option
     if remove_standard_libs:
         conda_list_modules = list(set(conda_list_modules) - set(get_standard_libraries()))
 
-    return pip_list_modules
+    return conda_list_modules
 
 
 # %%
 
 # Ideally, these should be mutually exclusive
-local_script_modules = get_script_modules(dir_py)  # your files
-pip_list_modules = get_pip_list_modules()  # $ pip list
-conda_list_modules = get_conda_list_modules()  # $ conda list
-yml_env_conda_modules, yml_env_pip_modules = get_yml_modules(True)  # yml content
-standard_libs = get_standard_libraries()
+local_script_modules = get_script_modules(dir_py, remove_standard_libs=True)
+# pip_list_modules = get_pip_list_modules()  # $ pip list
+# conda_list_modules = get_conda_list_modules()  # $ conda list
+# yml_env_conda_modules, yml_env_pip_modules = get_yml_modules(True)  # yml content
 
 # %%
 
-local_script_modules = list(set(local_script_modules) - set(standard_libs))
-
-# optional check: pypi has API, but not conda, so default on pip lookup
-pip_list_modules = list(set(pip_list_modules) - set(conda_list_modules) - set(standard_libs))
-
-# conda_list_libs = list(set(conda_list_libs) - set(pip_list_libs) - set(standard_libs))
-yml_env_conda_modules = list(set(yml_env_conda_modules) - set(standard_libs))
-yml_env_pip_modules = list(set(yml_env_pip_modules) - set(standard_libs))
-
-# %%
-
-print(f"length of local_script_libs: {len(local_script_modules)}")
-print(f"length of pip_list_modules: {len(pip_list_modules)}")
-print(f"length of conda_list_modules: {len(conda_list_modules)}")
-print(f"length of yml_env_conda_modules: {len(yml_env_conda_modules)}")
-print(f"length of yml_env_pip_modules: {len(yml_env_pip_modules)}")
-
-# %%
 
 def calc_delta_days(timestamp):
     """Input: string timestamp

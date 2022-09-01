@@ -15,9 +15,9 @@
             "github_header": "Info about db",
             "github_description": null,
             "github_created_at": "2012-06-11T23:41:23Z",
-            "github_created_at_delta": "3730 days, 0:00:00 days",
+            "github_created_at_delta": "3733 days, 0:00:00 days",
             "github_updated_at": "2021-04-03T22:01:26Z",
-            "github_updated_at_delta": "512 days, 0:00:00 days",
+            "github_updated_at_delta": "515 days, 0:00:00 days",
             "github_subscribers_count": 4,
             "github_stargazers_count": 5,
             "github_has_issues": true,
@@ -39,7 +39,7 @@
                 "stackoverflow_api_status": "success",
                 "stackoverflow_name": "database",
                 "stackoverflow_has_synonyms": true,
-                "stackoverflow_count": 188706
+                "stackoverflow_count": 188820
             }
         ]
     },
@@ -60,7 +60,7 @@
                 "stackoverflow_api_status": "success",
                 "stackoverflow_name": "sqlalchemy",
                 "stackoverflow_has_synonyms": false,
-                "stackoverflow_count": 21193
+                "stackoverflow_count": 21225
             }
         ]
     }
