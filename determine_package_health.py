@@ -4,15 +4,14 @@ Created on Thu Aug 18 19:12:28 2022
 
 @author: garth
 
-Pull library repo info from pypi and github, using APIs.
+Pull library repo info from pypi, github, stackoverflow APIs.
 
-This can be used to assess the vitality of a package.
+Output reflects how healthy a package is.
 
 To see what the API calls look like, load up Postman and get:
     pypi api: https://pypi.org/pypi/ipywidgets/json
     github api: https://api.github.com/repos/jupyter-widgets/ipywidgets
 """
-
 
 import requests
 import os
@@ -27,9 +26,8 @@ import fnmatch  # parse yml
 from pathlib import Path
 
 # set working path
-# TODO: provide linux solution
-dir_py = os.path.dirname(__file__)
-os.chdir(dir_py)  # change working path
+dir_py = os.path.dirname(os.path.abspath("__file__"))  # linux friendly
+os.chdir(dir_py)
 
 # %%
 
@@ -250,9 +248,9 @@ def get_conda_list_modules(remove_standard_libs=False) -> list:
 
 # Ideally, these should be mutually exclusive
 local_script_modules = get_script_modules(dir_py, remove_standard_libs=True)
-# pip_list_modules = get_pip_list_modules()  # $ pip list
-# conda_list_modules = get_conda_list_modules()  # $ conda list
-# yml_env_conda_modules, yml_env_pip_modules = get_yml_modules(True)  # yml content
+pip_list_modules = get_pip_list_modules()  # $ pip list
+conda_list_modules = get_conda_list_modules()  # $ conda list
+yml_env_conda_modules, yml_env_pip_modules = get_yml_modules(True)  # yml content
 
 # %%
 
