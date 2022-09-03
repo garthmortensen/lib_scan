@@ -90,10 +90,36 @@ standard_libs = get_standard_libraries()  # prolly exclude this from subsequent 
 # %%
 
 
-def get_script_modules(dir_py, remove_standard_libs=False):
+def get_script_names(dir_py):
     """
     Input: string directory of where your working project modules are.
-    Output: list of `import yxz` modules.
+    Output: 
+        list of filenames, without file extensions.
+
+    If you import a personally made module (e.g. `import db`), 
+    there may be a false positives in the API call results. Therefore,
+    filenames is returned so they can be removed from API searches.
+    """
+
+    dir_scripts = os.path.join(dir_py, "input_py")
+
+    filenames = []
+    for file in os.listdir(dir_scripts):
+        if file.endswith('.py'):
+            filenames.append(file.replace(".py", ""))  # filenames should be removed from repo search
+
+    return filenames
+
+
+local_script_names = get_script_names(dir_py)
+
+# %%
+
+def get_script_imports(dir_py, remove_standard_libs=False):
+    """
+    Input: string directory of where your working project modules are.
+    Output: 
+        list of `import yxz` modules.
 
     Collects all modules in directory, gets imports.
     The text parsing handles various import techniques, such as:
@@ -102,9 +128,6 @@ def get_script_modules(dir_py, remove_standard_libs=False):
         `from sqlalchemy import *`
 
     Optional: remove standard library modules from results.
-
-    Note: If you import a personally made module (e.g. `import db`), 
-    there may be a false positives in the API call results.
     """
 
     dir_scripts = os.path.join(dir_py, "input_py")
@@ -128,6 +151,9 @@ def get_script_modules(dir_py, remove_standard_libs=False):
 
     return script_modules
 
+
+local_script_imports = get_script_imports(dir_py, remove_standard_libs=True)
+
 # %%
 
 
@@ -138,7 +164,7 @@ def get_yml_modules(remove_standard_libs=False) -> list:
     """
 
     dir_yml = os.path.join(dir_py, "input_yml")
-    
+        
     dependencies_conda = []
     dependencies_pip = []
     for file in os.listdir(dir_yml):
@@ -152,13 +178,27 @@ def get_yml_modules(remove_standard_libs=False) -> list:
                 for module in dependencies:
                     # each module is a string in this list
                     if isinstance(module, str):
-                        dependencies_conda.append(module)
+                        # dependencies_conda_w_version.append(module)
+                        if "=" in module:
+                            module = module.split("=")[0].strip().lower()
+                            dependencies_conda.append(module)
+                        elif "://" in module:  # http sites can happen
+                            next
+                        else:
+                            dependencies_conda.append(module)
                     # pip dependencies, are a nested dict
                     # this contains single element list, so drill down again
-                    # then iterate through pip dependency list
-                    if isinstance(module, dict) and 'pip' in module.keys():
+                    # then iterate through pip dependency lis
+                    elif isinstance(module, dict) and 'pip' in module.keys():
                         for pip_module in module['pip']:
-                            dependencies_pip.append(pip_module)
+                            if "=" in module:
+                                pip_module = pip_module.split("=")[0].strip().lower()
+                                dependencies_pip.append(pip_module)
+                            elif "://" in pip_module:  # http sites can happen
+                                next
+                            else:
+                                dependencies_pip.append(pip_module)
+    
 
     # Not sure if standard libs are every in yml dependencies, but leaving as option
     if remove_standard_libs:
@@ -168,6 +208,8 @@ def get_yml_modules(remove_standard_libs=False) -> list:
     return {"yml_dependencies_conda": dependencies_conda, 
             "yml_dependencies_pip": dependencies_pip}
 
+
+yml_env_modules = get_yml_modules(remove_standard_libs=True)
 
 # %%
 
@@ -191,7 +233,7 @@ def get_pip_list_modules(remove_standard_libs=False) -> list:
     # Not sure if standard libs are every in yml dependencies, but leaving as option
     if remove_standard_libs:
         pip_list_modules = list(set(pip_list_modules) - set(get_standard_libraries()))
-
+    
     return pip_list_modules  # drop header lines
 
 
@@ -218,11 +260,7 @@ def get_conda_list_modules(remove_standard_libs=False) -> list:
     return conda_list_modules
 
 
-# %%
-
 # Ideally, these should be mutually exclusive
-local_script_modules = get_script_modules(dir_py, remove_standard_libs=True)
-yml_env_modules = get_yml_modules(remove_standard_libs=True)
 pip_list_modules = get_pip_list_modules(remove_standard_libs=True)  # $ pip list
 conda_list_modules = get_conda_list_modules(remove_standard_libs=True)  # $ conda list
 
