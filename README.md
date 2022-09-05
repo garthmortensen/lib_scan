@@ -1,10 +1,32 @@
-# Repo health
+# lib_scan
 
-This module checks the health of any imported packages found in a subdirectory of modules.
+```
+8 w 8
+8 w 88b.     d88b .d8b .d88 8 gm.
+8 8 8  8     `Yb. 8    8  8 8P Y8
+8 8 88P' www Y88P `Y8P `Y88 8   8
+```
 
-It ignore builtins and standard library packages.
+For packages found within .py modules and yml env files, pull info from APIs pypi, github condaforge, github and stackoverflow.
 
-You input the directory `./input_py`, which contains .py modules, and it performs API requests to return information about all imported packages, such as days since creation, days since last update, number of followers, number of pull requests + outstanding issues, number of stackoverflow tags, etc.
+To see what the an API call look like:
+    pypi api: https://pypi.org/pypi/ipywidgets/json
+    github api: https://api.github.com/repos/jupyter-widgets/ipywidgets
+
+Overall json output structure"
+
+```json
+modules = {"conda": [
+        	, "condaforge": []
+        	, "github": []
+        	, "stackoverflow": []
+        	]
+        , "pip": [
+        	, "pypi": []
+        	, "github": []
+        	, "stackoverflow": []
+        	]}
+```
 
 ## Standard Library
 
@@ -68,4 +90,15 @@ Framework = Kind of like complex libraries. Also a collection of modules designe
 
 ## Improvements
 
-Add support for R repo, CRAN.
+- Add support for R repo, CRAN.
+- Add support for requirements.txt
+
+- OOP refactor:
+      class Module(object):
+     - self.module name
+       lf.homepage
+          - self.SO tags
+            lf.in pip_list or conda_list
+               - self.repo info (pypi or condaforge stats)
+
+## 

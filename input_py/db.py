@@ -12,6 +12,14 @@ from sqlalchemy import inspect
 from sqlalchemy import Table, Column, Integer, String, DateTime
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy import func  # executes on db hardware
+import numpy  # for testing
+import pandas  # for testing
+import tensorflow  # for testing
+import keras  # for testing
+import libssh2  # conda only
+import zope  # conda only
+import fastjsonschema  # pip only
+import msgpack  # pip only
 
 
 def setup_db(in_memory: bool=True):
