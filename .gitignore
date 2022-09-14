@@ -1,2 +1,3 @@
 # ignore output
-./sample_scripts/*.json
+/input_py/backup/
+/input_yml/backup/

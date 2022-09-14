@@ -3,12 +3,13 @@
 Created on Thu Aug 18 19:12:28 2022
 
 @author: garth
-
-8 w 8
-8 w 88b.     d88b .d8b .d88 8 gm.
-8 8 8  8     `Yb. 8    8  8 8P Y8
-8 8 88P' www Y88P `Y8P `Y88 8   8
-
+ █    ▄█ ███      ▄▄▄▄▄   ▄█▄    ██      ▄   
+ █    ██ █  █    █     ▀▄ █▀ ▀▄  █ █      █  
+ █    ██ █ ▀ ▄ ▄  ▀▀▀▀▄   █   ▀  █▄▄█ ██   █ 
+ ███▄ ▐█ █  ▄▀  ▀▄▄▄▄▀    █▄  ▄▀ █  █ █ █  █ 
+     ▀ ▐ ███              ▀███▀     █ █  █ █ 
+                                   █  █   ██ 
+                                  ▀
 For packages found within .py modules and yml env files, pull info from APIs
 pypi, github condaforge, github and stackoverflow.
 
@@ -55,6 +56,7 @@ then oop refactor:
     class script_file(object):
 """
 
+import platform
 import requests
 import os
 import subprocess
@@ -64,18 +66,25 @@ import json
 from datetime import datetime  # for delta days
 import yaml
 
+# to timestamp file
+right_now = datetime.today().strftime('%Y%m%d_%H%M%S')
+
 # load github token to overcome api limit
 from pathlib import Path
 
 # set working path
-dir_py = os.path.dirname(os.path.abspath("__file__"))  # linux friendly
+if platform.system() == 'Windows':
+    dir_py = os.path.dirname(__file__)
+else:
+    dir_py = os.path.dirname(os.path.abspath("__file__"))  # linux friendly?
+
 os.chdir(dir_py)
 
 # %%
 
-def token_in_env(token_env: bool) -> str:
+def token_in_env(token_env: bool=False) -> str:
     """If you have Github token saved in ~/.env, input True.
-    Otherwise, input False and paste values below.
+    Otherwise, input False and paste values into below code.
     """
     if token_env:
 
@@ -96,7 +105,6 @@ def token_in_env(token_env: bool) -> str:
 
 github_user, github_token = token_in_env(True)
 
-
 # %%
 
 
@@ -116,7 +124,116 @@ def calc_delta_days(timestamp: str) -> str:
     return f"{delta} days"
 
 
-def pull_github_content(homepage: str) -> dict:
+def convert_github_page_to_endpoint(homepage: str):
+    """Convert github page to api endpoint
+    Input: https://github.com/jupyter-widgets/ipywidgets
+    Output: https://api.github.com/repos/jupyter-widgets/ipywidgets
+    """
+    owner_repo = homepage.split('://github.com/')[1]  # jupyter-widgets/ipywidgets
+    owner = owner_repo.split('/')[0]  # jupyter-widgets
+    repo = owner_repo.split('/')[1]  # ipywidgets
+    query_url = f"https://api.github.com/repos/{owner}/{repo}"
+    return query_url
+
+
+def find_github_pages(package: str) -> dict:
+    """Finds github pages listed on pypi and condaforge websites. If they list
+    the same github page, only one page is returned.
+    
+    Conda-forge raw readme link:
+    Read from condaforge raw feedstock readme.md file, parse for developer site,
+    then feed this url to github API.
+    Example file to be parsed:
+    https://raw.githubusercontent.com/conda-forge/setuptools-feedstock/main/README.md
+    
+    Input: package name
+    Output: dictionary of 1 or 2 github urls
+    """
+
+    repo_info = {}
+
+    # find github page on pypi
+    query_url = f"https://pypi.org/pypi/{package}/json"
+    sess = requests.Session()
+    response = sess.get(query_url, stream=True)  # stream until website found
+
+    # ensure request succeeds
+    if response.status_code != 200:  #  request failed
+        next
+
+    else:   # request succeeded
+        data = response.json()
+        try:  # if parent is None, error
+            key_parent = 'info'
+            key_child = 'project_urls'
+            key_grandchild = 'Homepage'
+            homepage = data.get(key_parent).get(key_child).get(key_grandchild)
+            if '://github.com/' in homepage:
+                query_url = convert_github_page_to_endpoint(homepage)
+                repo_info['github_page_pypi'] = query_url
+            # else:
+                # repo_info['github_page_pypi'] = "None"
+
+        except:
+            print(f"pypi call {package} for github page failed")
+
+    # TODO: get conda-forge github page
+    query_url = f"https://api.github.com/repos/conda-forge/{package}-feedstock"
+    sess = requests.Session()
+    response = sess.get(query_url, stream=True)  # stream until website found
+
+    # ensure request succeeds
+    if response.status_code != 200:  #  request failed
+        next
+
+    else:   # request succeeded
+        data = response.json()
+        try:  # if parent is None, error
+            repo_info['github_page_condaforge_repo'] = query_url
+
+        except:
+            print(f"conda-forge request {package} for github page failed")
+
+    # find github homepage page on condaforge
+    query_url = f"https://raw.githubusercontent.com/conda-forge/{package}-feedstock/main/README.md"
+    sess = requests.Session()
+    response = sess.get(query_url, stream=True)  # stream until website found
+
+    # ensure request succeeds
+    if response.status_code != 200:  #  request failed
+        next
+
+    else:   # request succeeded
+        # iterate through readme.md lines, stop early when the "dev:" found
+        for line in response.iter_lines():
+            if 'development:' in str(line).lower():
+                dev_line = line.decode('UTF-8')
+                homepage = dev_line.split(' ')[1].strip()
+                if '://github.com/' in homepage:
+                    query_url = convert_github_page_to_endpoint(homepage)
+                    repo_info['github_page_condaforge'] = query_url
+                    break  # stop parsing readme.md
+                # else:
+                    # repo_info['github_page_condaforge'] = "None"
+            else:
+                continue  # return to `if`
+    
+    # if both pypi and condaforge return same dev site, return one
+    if 'github_page_pypi' in repo_info and \
+        'github_page_condaforge' in repo_info and \
+        repo_info['github_page_pypi'] == repo_info['github_page_condaforge']:
+
+        repo_info['github_page_pypi_condaforge'] = query_url
+        del repo_info['github_page_pypi'], repo_info['github_page_condaforge']
+    
+    print(repo_info)
+    return repo_info
+
+
+# %%
+
+
+def pull_github_content(query_url: str) -> dict:
     """Pull repo stats using GitHub API. This provides stats not available via
     other pypi/conda repo API calls.
     Input:
@@ -126,13 +243,11 @@ def pull_github_content(homepage: str) -> dict:
         github API token
     Output: dict of pulled repo content
     """
-
     # parse page before constructing api query url
-    owner_repo = homepage.split('://github.com/')[1]  # jupyter-widgets/ipywidgets
+    owner_repo = query_url.split('://api.github.com/repos/')[1]  # jupyter-widgets/ipywidgets
     owner = owner_repo.split('/')[0]  # jupyter-widgets
     repo = owner_repo.split('/')[1]  # ipywidgets
 
-    query_url = f"https://api.github.com/repos/{owner}/{repo}"
     sess = requests.Session()
     # sess.proxies = proxies
     response = sess.get(query_url, auth=token_in_env(True))
@@ -228,54 +343,10 @@ def pull_github_content(homepage: str) -> dict:
             key_parent = "commits_max_30"
             github_repo_info[f"github_{key_parent}"] = commit_count
 
-    # print(json.dumps(github_repo_info))
     return github_repo_info
 
 
 # %%
-
-def pull_condaforge_content(module: str) -> dict:
-    """
-    Read from condaforge raw feedstock readme.md file, parse for developer site,
-    then feed this url to github API.
-    Example file to be parsed:
-    https://raw.githubusercontent.com/conda-forge/qtconsole-feedstock/main/README.md
-
-    Input: module name
-    Output: dict of module's Github content
-    """
-
-    condaforge_repo_info = {}
-    query_url = f"https://raw.githubusercontent.com/conda-forge/{module}-feedstock/main/README.md"
-
-    key_parent = "api_url_repo"
-    condaforge_repo_info[f"condaforge_{key_parent}"] = query_url
-
-    sess = requests.Session()
-    response = sess.get(query_url, stream=True)  # stream until website found
-
-    # ensure request succeeds
-    if response.status_code != 200:  #  request failed
-        condaforge_repo_info['github_api_status'] = "fail"
-
-    else:   # request succeeded
-        # iterate through readme.md lines, stop early when the "dev:" found
-        for line in response.iter_lines():
-            if 'development:' in str(line).lower():
-                dev_line = line.decode('UTF-8')
-                homepage = dev_line.split(' ')[1].strip()
-                if '://github.com/' in homepage:
-                    # https://api.github.com/repos/{owner}/{repo}
-                    # https://github.com/jupyter-widgets/ipywidgets
-                    github_api_call = pull_github_content(homepage)
-                    condaforge_repo_info['github_api_pull'] = github_api_call
-                    break  # stop parsing readme.md
-                else:
-                    condaforge_repo_info['github_api_pull'] = "Github dev site not listed."
-            else:
-                condaforge_repo_info['github_api_pull'] = "development site not listed."
-
-    return condaforge_repo_info
 
 
 def pull_stackoverflow_content(package: str) -> dict:
@@ -283,14 +354,14 @@ def pull_stackoverflow_content(package: str) -> dict:
     API limit is 300 requests/day. OAuth registration requires a domain.
     Example endpoint:
     https://api.stackexchange.com/2.3/packages/{package}/info?site=stackoverflow
-    https://stackoverflow.com/questions/packageged/{package}
+    https://stackoverflow.com/questions/packages/{package}
 
     Input: library name as string
     Output: dict of stackoverflow stats
     """
 
     package = package  # search SO for package name as package
-    query_url = f"https://api.stackexchange.com/2.3/packages/{package}/info?site=stackoverflow"
+    query_url = f"https://api.stackexchange.com/2.3/tags?inname={package}&site=stackoverflow"
     sess = requests.Session()
     response = sess.get(query_url, stream=True)  # stream until website found
 
@@ -307,6 +378,8 @@ def pull_stackoverflow_content(package: str) -> dict:
             data = response.json()
             data = data['items'][0]  # items contains a list of length 1!
             package_info['stackoverflow_api_status'] = "success"
+
+            package_info['stackoverflow_api_call'] = query_url
 
             key_parent = 'name'
             package_info[f"stackoverflow_{key_parent}"] = data.get(key_parent)
@@ -374,21 +447,6 @@ def pull_pypi_content(package: str) -> dict:
         # json section: info github============================================
         key_parent = 'info'
 
-        try:  # if parent is None, error
-            key_child = 'project_urls'
-            key_grandchild = 'Homepage'
-
-            # json section: github=============================================
-            homepage = data.get(key_parent).get(key_child).get(key_grandchild)
-            if '://github.com/' in homepage:
-                github_api_call = pull_github_content(homepage)
-                repo_info['github_api_pull'] = github_api_call
-            else:
-                repo_info['github_api_pull'] = "Github dev site not listed."
-
-        except:
-            print(f"pypi call {package} contains missing data on: {key_parent}, {key_child}, {key_grandchild}")
-
     pypi_results["pypi"] = repo_info
 
     return pypi_results
@@ -431,7 +489,7 @@ def get_conda_list_modules() -> list:
     return conda_list_modules
 
 
-def get_standard_libraries() -> list:
+def get_standard_libraries(attempt_reading_libs=False) -> list:
     """
     Get list of all standard libraries. If code fails, it returns the hardcoded
     standard library for python version 3.9.7
@@ -440,16 +498,20 @@ def get_standard_libraries() -> list:
     list of standard library names found in Lib dir.
     """
 
-    try:
-        # start list with python version
-        standard_libraries = []
-        standard_libraries.append(sys.version)    
-        standard_lib_path = os.path.join(sys.prefix, "Lib")
-        for file in os.listdir(standard_lib_path):
-            standard_libraries.append(file.split(".py")[0].strip().lower())
+    if attempt_reading_libs:
+        try:
+            # start list with python version
+            standard_libraries = []
+            standard_libraries.append(sys.version)    
+            standard_lib_path = os.path.join(sys.prefix, "Lib")
+            for file in os.listdir(standard_lib_path):
+                standard_libraries.append(file.split(".py")[0].strip().lower())
         
-    except:  # still working on linux functionality
-        standard_libraries = ["3.9.7 (default, Sep 16 2021, 16:59:28) [MSC v.1916 64 bit (AMD64)]", "abc", "aifc", "antigravity", "argparse", "ast", "asynchat", "asyncio", "asyncore", "base64", "bdb", "binhex", "bisect", "bz2", "calendar", "cgi", "cgitb", "chunk", "cmd", "code", "codecs", "codeop", "collections", "colorsys", "compileall", "concurrent", "configparser", "contextlib", "contextvars", "copy", "copyreg", "cprofile", "crypt", "csv", "ctypes", "curses", "dataclasses", "datetime", "dbm", "decimal", "difflib", "dis", "distutils", "doctest", "email", "encodings", "ensurepip", "enum", "filecmp", "fileinput", "fnmatch", "formatter", "fractions", "ftplib", "functools", "genericpath", "getopt", "getpass", "gettext", "glob", "graphlib", "gzip", "hashlib", "heapq", "hmac", "html", "http", "idlelib", "imaplib", "imghdr", "imp", "importlib", "inspect", "io", "ipaddress", "json", "keyword", "lib2to3", "linecache", "locale", "logging", "lzma", "mailbox", "mailcap", "mimetypes", "modulefinder", "msilib", "multiprocessing", "netrc", "nntplib", "ntpath", "nturl2path", "numbers", "opcode", "operator", "optparse", "os", "pathlib", "pdb", "pickle", "pickletools", "pipes", "pkgutil", "platform", "plistlib", "poplib", "posixpath", "pprint", "profile", "pstats", "pty", "pyclbr", "pydoc", "pydoc_data", "py_compile", "queue", "quopri", "random", "re", "reprlib", "rlcompleter", "runpy", "sched", "secrets", "selectors", "shelve", "shlex", "shutil", "signal", "site-packages", "site", "smtpd", "smtplib", "sndhdr", "socket", "socketserver", "sqlite3", "sre_compile", "sre_constants", "sre_parse", "ssl", "stat", "statistics", "string", "stringprep", "struct", "subprocess", "sunau", "symbol", "symtable", "sysconfig", "tabnanny", "tarfile", "telnetlib", "tempfile", "test", "textwrap", "this", "threading", "timeit", "tkinter", "token", "tokenize", "trace", "traceback", "tracemalloc", "tty", "turtle", "turtledemo", "types", "typing", "unittest", "urllib", "uu", "uuid", "venv", "warnings", "wave", "weakref", "webbrowser", "wsgiref", "xdrlib", "xml", "xmlrpc", "zipapp", "zipfile", "zipimport", "zoneinfo", "_aix_support", "_bootlocale", "_bootsubprocess", "_collections_abc", "_compat_pickle", "_compression", "_markupbase", "_nsis", "_osx_support", "_pydecimal", "_pyio", "_py_abc", "_sitebuiltins", "_strptime", "_system_path", "_threading_local", "_weakrefset", "__future__", "__phello__.foo", "__pycache__", ]
+        except:  # still working on linux functionality
+            print("get_standard_libraries failed. Run with arg = False")
+    
+    else:
+        standard_libraries = ["__future__", "__main__", "__phello__.foo", "__pycache__", "_aix_support", "_bootlocale", "_bootsubprocess", "_collections_abc", "_compat_pickle", "_compression", "_markupbase", "_nsis", "_osx_support", "_py_abc", "_pydecimal", "_pyio", "_sitebuiltins", "_strptime", "_system_path", "_thread", "_threading_local", "_weakrefset", "abc", "aifc", "antigravity", "argparse", "array", "ast", "asynchat", "asyncio", "asyncore", "atexit", "audioop", "base64", "bdb", "binascii", "binhex", "bisect", "builtins", "bz2", "cProfile", "calendar", "cgi", "cgitb", "chunk", "cmath", "cmd", "code", "codecs", "codeop", "collections", "colorsys", "compileall", "concurrent", "configparser", "contextlib", "contextvars", "copy", "copyreg", "cprofile", "crypt", "crypt ", "csv", "ctypes", "curses", "curses ", "dataclasses", "datetime", "dbm", "decimal", "difflib", "dis", "distutils", "doctest", "email", "encodings", "ensurepip", "enum", "errno", "faulthandler", "fcntl ", "filecmp", "fileinput", "fnmatch", "formatter", "fractions", "ftplib", "functools", "gc", "genericpath", "getopt", "getpass", "gettext", "glob", "graphlib", "grp ", "gzip", "hashlib", "heapq", "hmac", "html", "http", "idlelib", "imaplib", "imghdr", "imp", "importlib", "inspect", "io", "ipaddress", "itertools", "json", "keyword", "lib2to3", "linecache", "locale", "logging", "lzma", "mailbox", "mailcap", "marshal", "math", "mimetypes", "mmap", "modulefinder", "msilib", "msilib ", "msvcrt ", "multiprocessing", "netrc", "nis ", "nntplib", "ntpath", "nturl2path", "numbers", "opcode", "operator", "optparse", "os", "ossaudiodev ", "pathlib", "pdb", "pickle", "pickletools", "pipes", "pipes ", "pkgutil", "platform", "plistlib", "poplib", "posixpath", "posix ", "pprint", "profile", "pstats", "pty", "pty ", "pwd ", "py_compile", "pyclbr", "pydoc", "pydoc_data", "queue", "quopri", "random", "re", "readline ", "reprlib", "resource ", "rlcompleter", "runpy", "sched", "secrets", "select", "selectors", "shelve", "shlex", "shutil", "signal", "site", "site-packages", "smtpd", "smtplib", "sndhdr", "socket", "socketserver", "spwd ", "sqlite3", "sre_compile", "sre_constants", "sre_parse", "ssl", "stat", "statistics", "string", "stringprep", "struct", "subprocess", "sunau", "symbol", "symtable", "sys", "sysconfig", "syslog ", "tabnanny", "tarfile", "telnetlib", "tempfile", "termios ", "test", "textwrap", "this", "threading", "time", "timeit", "tkinter", "token", "tokenize", "trace", "traceback", "tracemalloc", "tty", "tty ", "turtle", "turtledemo", "types", "typing", "unicodedata", "unittest", "urllib", "uu", "uuid", "venv", "warnings", "wave", "weakref", "webbrowser", "winreg ", "winsound ", "wsgiref", "xdrlib", "xml", "xmlrpc", "zipapp", "zipfile", "zipimport", "zlib", "zoneinfo", ]
 
     return standard_libraries
 
@@ -501,43 +563,53 @@ def get_script_imports(dir_py: str) -> dict:
     dir_scripts = os.path.join(dir_py, "input_py")
 
     # get lists of installed modules
-    conda_list_modules = get_conda_list_modules()  # $ conda list
-    pip_list_modules = get_pip_list_modules()  # $ pip list
+    # conda_list_modules = get_conda_list_modules()  # $ conda list
+    # pip_list_modules = get_pip_list_modules()  # $ pip list
 
     already_checked = []
     conda_modules = {}
     pip_modules = {}
     all_modules = {}
     for file in os.listdir(dir_scripts):
+        print(f"processing file: {file}")
         if file.endswith('.py'):
             filepath = os.path.join(dir_scripts, file)
             lines = open(filepath, "r").readlines()
 
             for line in lines:
-                if 'import' in line:
-                    import_line = line.split(' ')[1]
-                    module = import_line.strip().lower()
+                if 'import' in line.casefold():
+                    module = line.split(' ')[1]
+                    module = module.strip().lower()
                     # this handles `from sqlalchemy import a, from sqlalchemy import b`
 
-                    if import_line not in get_standard_libraries() \
-                            and import_line not in get_script_names(dir_py) \
-                            and import_line not in already_checked:
-                        already_checked.append(import_line)
+                    if module not in get_standard_libraries() \
+                            and module not in get_script_names(dir_py) \
+                            and module not in already_checked:
+                        already_checked.append(module)
+                        print(f"processing module: {module}")
 
-                        if import_line in conda_list_modules:
-                            conda_modules[module] = pull_stackoverflow_content(module)
-                            conda_modules[module]["condaforge"] = pull_condaforge_content(module)
+                        # if module in conda_list_modules:
+                            # conda_modules[module] = pull_stackoverflow_content(module)
 
-                        elif import_line in pip_list_modules:
-                            pip_modules[module] = pull_stackoverflow_content(module)
-                            pip_modules[module]["pypi"] = pull_pypi_content(module)
+                        # elif module in pip_list_modules:
+                            # pip_modules[module] = pull_stackoverflow_content(module)
+                            # pip_modules[module]["pypi"] = pull_pypi_content(module)
+                            
+                        # else:  # if module not conda or pip installed
+                        pip_modules[module] = pull_stackoverflow_content(module)
+                        pip_modules[module]["pypi"] = pull_pypi_content(module)
+                        pip_modules[module]["github"] = find_github_pages(module)
+
+                        # get all homepages and make github endpoint calls
+                        for key, homepage in pip_modules[module]["github"].items():
+                            pip_modules[module]["github"][key] = pull_github_content(homepage)
 
     all_modules["conda_modules"] = conda_modules
     all_modules["pip_modules"] = pip_modules
 
     # write to file
     file = json.dumps(all_modules, indent=4)
-    with open(os.path.join(dir_py, "output", "local_script_imports.json"), "w") as outfile:
+    with open(os.path.join(dir_py, "output", f"local_script_imports_{right_now}.json"), "w") as outfile:
         outfile.write(file)
 
     return all_modules
@@ -577,7 +649,6 @@ def get_yml_modules() -> dict:
                         if "=" in module:
                             module = module.split("=")[0].strip().lower()
                             conda_modules[module] = pull_stackoverflow_content(module)
-                            conda_modules[module]["condaforge"] = pull_condaforge_content(module)
                         elif "://" in module:  # http sites can happen
                             next
                         else:
@@ -602,10 +673,10 @@ def get_yml_modules() -> dict:
 
     # write to file
     file = json.dumps(all_modules, indent=4)
-    with open(os.path.join(dir_py, "output", "yml_env_modules.json"), "w") as outfile:
+    with open(os.path.join(dir_py, "output", f"yml_env_modules_{right_now}.json"), "w") as outfile:
         outfile.write(file)
 
     return all_modules
 
 
-yml_env_modules = get_yml_modules()
+# yml_env_modules = get_yml_modules()
