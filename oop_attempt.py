@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 18 19:12:28 2022
-
-@author: garth
+Created on Mon Oct 10 11:23:21 2022
  
  L
  L:         L         L:LLLL
@@ -16,39 +14,7 @@ Created on Thu Aug 18 19:12:28 2022
   LL    LL    :LLL        LLLLLL:      LLLLL                  gm
   LL
 
-For packages found within .py modules and yml env files, pull info from APIs
-pypi, github condaforge, github and stackoverflow.
 
-To see what the an API call look like:
-    pypi api: https://pypi.org/pypi/ipywidgets/json
-    github api: https://api.github.com/repos/jupyter-widgets/ipywidgets
-
-refactor for clean functional programming:
-2 source files:
-    1. yml
-        - dependencies
-        [API calls condaforge, SO, github]
-            - pip:
-                [API calls pypi, SO, github]
-    2. local_py_imports
-        - less *.py local filenames
-        - less standard_libraries
-        - lists
-            if in conda_list:
-                [API calls condaforge, SO, github]
-            elif in pip_list:
-                [API calls pypi, SO, github]
-
-modules = {"conda": [
-        	, "condaforge": []
-        	, "github": []
-        	, "stackoverflow": []
-        	]
-        , "pip": [
-        	, "pypi": []
-        	, "github": []
-        	, "stackoverflow": []
-        	]}
 
 then oop refactor:
     class Module(object):
@@ -71,7 +37,6 @@ import sys
 import json
 from datetime import datetime  # for delta days
 import yaml
-import argparse
 
 # to timestamp file
 right_now = datetime.today().strftime('%Y%m%d_%H%M%S')
@@ -89,29 +54,9 @@ os.chdir(dir_py)
 
 # %%
 
-module_name, ext = os.path.splitext(__file__)
-module_name = module_name.split('\\')[-1]
-
-parser = argparse.ArgumentParser(prog=module_name,
-                                 # usage='%(prog)s distance [--conversion]',
-                                 description='Given python libraries, produces a set of health indicators from source repos',
-                                 epilog='Please suggest any improvements.')
-
-parser.add_argument('-c', '--creds_in_txt',
-                    help="Use this option if your creds are saved in ./creds.txt, not ~./env")
-
-parser.add_argument('-s', '--source',  # the option
-                    help="If you want to generate output from python scripts, input `scripts`. Otherwise, if yaml/yml, input `yaml`",
-                    choices=['scripts', 'yaml'],
-                    default='scripts')  # if no option, default on addition
-
-# %%
-
-
 def token_in_env(token_env: bool=False) -> str:
     """If you have Github token saved in ~/.env, input True.
-    Otherwise, input your Github user and pass into ./creds.txt,
-    on line 1 and line 2, per the provided format.
+    Otherwise, input False and paste values into below code.
     """
     if token_env:
 
@@ -124,20 +69,13 @@ def token_in_env(token_env: bool=False) -> str:
         github_token = os.getenv("github_token")
 
     else:
-        try:
-            # read github tokens from script dir, creds.txt
-            current_path = os.path.realpath(os.getcwd())
-            filename = "creds.txt"
-            full_path = f"{current_path}\\{filename}"
-            # read lines and extract as variables
-            lines = open(full_path, "r").readlines()
-            github_user, github_token = lines[0].strip(), lines[1].strip()
-        
-        except:
-            print("Error related to reading Github creds from ./creds.txt")
+        github_user = ""
+        github_token = ""
 
-        return github_user, github_token
+    return github_user, github_token
 
+
+github_user, github_token = token_in_env(True)
 
 # %%
 
@@ -167,7 +105,6 @@ def convert_github_page_to_endpoint(homepage: str):
     owner = owner_repo.split('/')[0]  # jupyter-widgets
     repo = owner_repo.split('/')[1]  # ipywidgets
     query_url = f"https://api.github.com/repos/{owner}/{repo}"
-
     return query_url
 
 
@@ -221,7 +158,7 @@ def find_github_pages(package: str) -> dict:
     if response.status_code != 200:  #  request failed
         next
 
-    else:  # request succeeded
+    else:   # request succeeded
         data = response.json()
         try:  # if parent is None, error
             repo_info['github_page_condaforge_repo'] = query_url
@@ -238,7 +175,7 @@ def find_github_pages(package: str) -> dict:
     if response.status_code != 200:  #  request failed
         next
 
-    else:  # request succeeded
+    else:   # request succeeded
         # iterate through readme.md lines, stop early when the "dev:" found
         for line in response.iter_lines():
             if 'development:' in str(line).lower():
@@ -262,7 +199,6 @@ def find_github_pages(package: str) -> dict:
         del repo_info['github_page_pypi'], repo_info['github_page_condaforge']
     
     print(repo_info)
-
     return repo_info
 
 
@@ -409,7 +345,7 @@ def pull_stackoverflow_content(package: str) -> dict:
     if response.status_code != 200:  #  request failed
         package_info['stackoverflow_api_status'] = "fail"
 
-    else:  # request succeeded
+    else:   # request succeeded
         try:
             data = response.json()
             data = data['items'][0]  # items contains a list of length 1!
@@ -454,7 +390,7 @@ def pull_pypi_content(package: str) -> dict:
     if response.status_code != 200:  #  request failed
         repo_info['pypi_api_status'] = "fail"
 
-    else:  # request succeeded
+    else:   # request succeeded
         data = response.json()
 
         repo_info['pypi_api_status'] = "success"
@@ -538,7 +474,7 @@ def get_standard_libraries(attempt_reading_libs=False) -> list:
         try:
             # start list with python version
             standard_libraries = []
-            standard_libraries.append(sys.version)
+            standard_libraries.append(sys.version)    
             standard_lib_path = os.path.join(sys.prefix, "Lib")
             for file in os.listdir(standard_lib_path):
                 standard_libraries.append(file.split(".py")[0].strip().lower())
@@ -651,8 +587,7 @@ def get_script_imports(dir_py: str) -> dict:
     return all_modules
 
 
-# option added
-# local_script_imports = get_script_imports(dir_py)
+local_script_imports = get_script_imports(dir_py)
 
 # %%
 
@@ -716,22 +651,4 @@ def get_yml_modules() -> dict:
     return all_modules
 
 
-# option added
 # yml_env_modules = get_yml_modules()
-
-# %% 
-
-# parse arguments provided in CLI
-opts = parser.parse_args()
-
-# read credentials from creds.txt else ~/.env
-if opts.creds_in_txt:
-    github_user, github_token = token_in_env(False)
-else:
-    github_user, github_token = token_in_env(True)
-
-# generate repo health output from either scripts/modules or yml/yaml
-if opts.source == "scripts":
-    get_script_imports(dir_py)
-elif opts.source == "yml" or opts.source == "yaml":
-    get_yml_modules()
