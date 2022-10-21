@@ -1,0 +1,94 @@
+{
+    "conda_modules": {
+        "ipython": {
+            "stackoverflow_package": "ipython",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=ipython&site=stackoverflow",
+            "stackoverflow_name": "ipython",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 7063
+        },
+        "matplotlib": {
+            "stackoverflow_package": "matplotlib",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=matplotlib&site=stackoverflow",
+            "stackoverflow_name": "matplotlib",
+            "stackoverflow_has_synonyms": true,
+            "stackoverflow_count": 67635
+        },
+        "pandas": {
+            "stackoverflow_package": "pandas",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=pandas&site=stackoverflow",
+            "stackoverflow_name": "pandas",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 261444
+        },
+        "python": {
+            "stackoverflow_package": "python",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=python&site=stackoverflow",
+            "stackoverflow_name": "python",
+            "stackoverflow_has_synonyms": true,
+            "stackoverflow_count": 2036492
+        },
+        "scikit-learn": {
+            "stackoverflow_package": "scikit-learn",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=scikit-learn&site=stackoverflow",
+            "stackoverflow_name": "scikit-learn",
+            "stackoverflow_has_synonyms": true,
+            "stackoverflow_count": 26762
+        },
+        "pip": {
+            "stackoverflow_package": "pip",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=pip&site=stackoverflow",
+            "stackoverflow_name": "pip",
+            "stackoverflow_has_synonyms": true,
+            "stackoverflow_count": 21394
+        }
+    },
+    "pip_modules": {
+        "kaggle": {
+            "stackoverflow_package": "kaggle",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=kaggle&site=stackoverflow",
+            "stackoverflow_name": "kaggle",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 996,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "kaggle",
+                    "pypi_header": "Info about kaggle",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "Kaggle API",
+                    "pypi_info_requires_python": "",
+                    "pypi_info_requires_dist": "None",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            }
+        },
+        "yellowbrick": {
+            "stackoverflow_package": "yellowbrick",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=yellowbrick&site=stackoverflow",
+            "stackoverflow_name": "yellowbrick",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 62,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "yellowbrick",
+                    "pypi_header": "Info about yellowbrick",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "A suite of visual analysis and diagnostic tools for machine learning.",
+                    "pypi_info_requires_python": ">=3.4, <4",
+                    "pypi_info_requires_dist": "['matplotlib (!=3.0.0,>=2.0.2)', 'scipy (>=1.0.0)', 'scikit-learn (>=1.0.0)', 'numpy (>=1.16.0)', 'cycler (>=0.10.0)']",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            }
+        }
+    }
+}

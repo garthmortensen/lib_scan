@@ -1,10 +1,17 @@
 # lib_scan
 
 ```
-8 w 8
-8 w 88b.     d88b .d8b .d88 8 gm.
-8 8 8  8     `Yb. 8    8  8 8P Y8
-8 8 88P' www Y88P `Y8P `Y88 8   8
+ L
+ L:         L         L:LLLL
+ L:     L   LL      LLLL  LLL
+ LL    LoL  LL      LL:
+ LL     L    LL      :LLLLLLL                             LLL
+ :L          LL          L:LLLLL       L:LL      :LL   L::LLLL
+  LL         LLLL:            :LL:   LLLLL:   LLLLLL   LLL: LLL
+  LL    LL   :L  LL             :L   LL       LLLLLL   LLL   LL
+  LL    LL   LL  LL       LLL  LLL   LLLL:::  LLL L:   :L     L:
+  LL    LL    :LLL        LLLLLL:      LLLLL                  gm
+  LL
 ```
 
 For packages found within .py modules and yml env files, pull info from APIs pypi, github condaforge, github and stackoverflow.

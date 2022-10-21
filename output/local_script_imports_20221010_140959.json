@@ -1,0 +1,461 @@
+{
+    "conda_modules": {},
+    "pip_modules": {
+        "sqlalchemy": {
+            "stackoverflow_package": "sqlalchemy",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=sqlalchemy&site=stackoverflow",
+            "stackoverflow_name": "sqlalchemy",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 21444,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "sqlalchemy",
+                    "pypi_header": "Info about sqlalchemy",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "Database Abstraction Library",
+                    "pypi_info_requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7",
+                    "pypi_info_requires_dist": "None",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {
+                "github_page_condaforge_repo": {
+                    "github_api_url_repo": "https://api.github.com/repos/conda-forge/sqlalchemy-feedstock",
+                    "github_api_status": "success",
+                    "github_package": "sqlalchemy-feedstock",
+                    "github_header": "Info about sqlalchemy-feedstock",
+                    "github_description": "A conda-smithy repository for sqlalchemy.",
+                    "github_created_at": "2017-01-02T21:45:35Z",
+                    "github_created_at_delta": "2107 days, 0:00:00 days",
+                    "github_updated_at": "2021-12-23T11:53:30Z",
+                    "github_updated_at_delta": "291 days, 0:00:00 days",
+                    "github_subscribers_count": 8,
+                    "github_stargazers_count": 0,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 0,
+                    "github_open_issues": 0,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 20,
+                    "github_forks": 20,
+                    "github_commits_max_30": 30
+                },
+                "github_page_condaforge": {
+                    "github_api_url_repo": "https://api.github.com/repos/sqlalchemy/sqlalchemy",
+                    "github_api_status": "success",
+                    "github_package": "sqlalchemy",
+                    "github_header": "Info about sqlalchemy",
+                    "github_description": "The Database Toolkit for Python",
+                    "github_created_at": "2018-11-27T03:35:03Z",
+                    "github_created_at_delta": "1413 days, 0:00:00 days",
+                    "github_updated_at": "2022-10-10T08:56:38Z",
+                    "github_updated_at_delta": "0:00:00 days",
+                    "github_subscribers_count": 93,
+                    "github_stargazers_count": 6074,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 154,
+                    "github_open_issues": 154,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": true,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 983,
+                    "github_forks": 983,
+                    "github_commits_max_30": 30
+                }
+            }
+        },
+        "numpy": {
+            "stackoverflow_package": "numpy",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=numpy&site=stackoverflow",
+            "stackoverflow_name": "numpy",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 106331,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "numpy",
+                    "pypi_header": "Info about numpy",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "NumPy is the fundamental package for array computing with Python.",
+                    "pypi_info_requires_python": ">=3.8",
+                    "pypi_info_requires_dist": "None",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {
+                "github_page_condaforge_repo": {
+                    "github_api_url_repo": "https://api.github.com/repos/conda-forge/numpy-feedstock",
+                    "github_api_status": "success",
+                    "github_package": "numpy-feedstock",
+                    "github_header": "Info about numpy-feedstock",
+                    "github_description": "A conda-smithy repository for numpy.",
+                    "github_created_at": "2016-05-20T11:52:36Z",
+                    "github_created_at_delta": "2334 days, 0:00:00 days",
+                    "github_updated_at": "2022-01-03T02:28:44Z",
+                    "github_updated_at_delta": "280 days, 0:00:00 days",
+                    "github_subscribers_count": 13,
+                    "github_stargazers_count": 5,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 6,
+                    "github_open_issues": 6,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 41,
+                    "github_forks": 41,
+                    "github_commits_max_30": 30
+                },
+                "github_page_condaforge": {
+                    "github_api_url_repo": "https://api.github.com/repos/numpy/numpy",
+                    "github_api_status": "success",
+                    "github_package": "numpy",
+                    "github_header": "Info about numpy",
+                    "github_description": "The fundamental package for scientific computing with Python.",
+                    "github_created_at": "2010-09-13T23:02:39Z",
+                    "github_created_at_delta": "4410 days, 0:00:00 days",
+                    "github_updated_at": "2022-10-10T15:47:32Z",
+                    "github_updated_at_delta": "0:00:00 days",
+                    "github_subscribers_count": 568,
+                    "github_stargazers_count": 21648,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 2255,
+                    "github_open_issues": 2255,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": true,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 7397,
+                    "github_forks": 7397,
+                    "github_commits_max_30": 30
+                }
+            }
+        },
+        "pandas": {
+            "stackoverflow_package": "pandas",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=pandas&site=stackoverflow",
+            "stackoverflow_name": "pandas",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 261444,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "pandas",
+                    "pypi_header": "Info about pandas",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "Powerful data structures for data analysis, time series, and statistics",
+                    "pypi_info_requires_python": ">=3.8",
+                    "pypi_info_requires_dist": "['python-dateutil (>=2.8.1)', 'pytz (>=2020.1)', 'numpy (>=1.20.3) ; python_version < \"3.10\"', 'numpy (>=1.21.0) ; python_version >= \"3.10\"', \"hypothesis (>=5.5.3) ; extra == 'test'\", \"pytest (>=6.0) ; extra == 'test'\", \"pytest-xdist (>=1.31) ; extra == 'test'\"]",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {
+                "github_page_condaforge_repo": {
+                    "github_api_url_repo": "https://api.github.com/repos/conda-forge/pandas-feedstock",
+                    "github_api_status": "success",
+                    "github_package": "pandas-feedstock",
+                    "github_header": "Info about pandas-feedstock",
+                    "github_description": "A conda-smithy repository for pandas.",
+                    "github_created_at": "2016-05-03T19:36:02Z",
+                    "github_created_at_delta": "2351 days, 0:00:00 days",
+                    "github_updated_at": "2021-12-17T03:32:35Z",
+                    "github_updated_at_delta": "297 days, 0:00:00 days",
+                    "github_subscribers_count": 14,
+                    "github_stargazers_count": 4,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 1,
+                    "github_open_issues": 1,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 33,
+                    "github_forks": 33,
+                    "github_commits_max_30": 30
+                }
+            }
+        },
+        "tensorflow": {
+            "stackoverflow_package": "tensorflow",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=tensorflow&site=stackoverflow",
+            "stackoverflow_name": "tensorflow",
+            "stackoverflow_has_synonyms": true,
+            "stackoverflow_count": 79224,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "tensorflow",
+                    "pypi_header": "Info about tensorflow",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "TensorFlow is an open source machine learning framework for everyone.",
+                    "pypi_info_requires_python": ">=3.7",
+                    "pypi_info_requires_dist": "['absl-py (>=1.0.0)', 'astunparse (>=1.6.0)', 'flatbuffers (>=2.0)', 'gast (<=0.4.0,>=0.2.1)', 'google-pasta (>=0.1.1)', 'h5py (>=2.9.0)', 'keras-preprocessing (>=1.1.1)', 'libclang (>=13.0.0)', 'numpy (>=1.20)', 'opt-einsum (>=2.3.2)', 'packaging', 'protobuf (<3.20,>=3.9.2)', 'setuptools', 'six (>=1.12.0)', 'termcolor (>=1.1.0)', 'typing-extensions (>=3.6.6)', 'wrapt (>=1.11.0)', 'tensorflow-io-gcs-filesystem (>=0.23.1)', 'grpcio (<2.0,>=1.24.3)', 'tensorboard (<2.11,>=2.10)', 'tensorflow-estimator (<2.11,>=2.10.0)', 'keras (<2.11,>=2.10.0)']",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {
+                "github_page_condaforge_repo": {
+                    "github_api_url_repo": "https://api.github.com/repos/conda-forge/tensorflow-feedstock",
+                    "github_api_status": "success",
+                    "github_package": "tensorflow-feedstock",
+                    "github_header": "Info about tensorflow-feedstock",
+                    "github_description": "A conda-smithy repository for tensorflow.",
+                    "github_created_at": "2016-03-02T08:51:40Z",
+                    "github_created_at_delta": "2413 days, 0:00:00 days",
+                    "github_updated_at": "2022-10-09T01:37:17Z",
+                    "github_updated_at_delta": "1 day, 0:00:00 days",
+                    "github_subscribers_count": 12,
+                    "github_stargazers_count": 80,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 26,
+                    "github_open_issues": 26,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 77,
+                    "github_forks": 77,
+                    "github_commits_max_30": 30
+                },
+                "github_page_condaforge": {
+                    "github_api_url_repo": "https://api.github.com/repos/tensorflow/tensorflow",
+                    "github_api_status": "success",
+                    "github_package": "tensorflow",
+                    "github_header": "Info about tensorflow",
+                    "github_description": "An Open Source Machine Learning Framework for Everyone",
+                    "github_created_at": "2015-11-07T01:19:20Z",
+                    "github_created_at_delta": "2529 days, 0:00:00 days",
+                    "github_updated_at": "2022-10-10T18:10:47Z",
+                    "github_updated_at_delta": "0:00:00 days",
+                    "github_subscribers_count": 7807,
+                    "github_stargazers_count": 168299,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 2364,
+                    "github_open_issues": 2364,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 87256,
+                    "github_forks": 87256,
+                    "github_commits_max_30": 30
+                }
+            }
+        },
+        "keras": {
+            "stackoverflow_package": "keras",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=keras&site=stackoverflow",
+            "stackoverflow_name": "keras",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 40716,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "keras",
+                    "pypi_header": "Info about keras",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "Deep learning for humans.",
+                    "pypi_info_requires_python": "",
+                    "pypi_info_requires_dist": "None",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {
+                "github_page_condaforge_repo": {
+                    "github_api_url_repo": "https://api.github.com/repos/conda-forge/keras-feedstock",
+                    "github_api_status": "success",
+                    "github_package": "keras-feedstock",
+                    "github_header": "Info about keras-feedstock",
+                    "github_description": "A conda-smithy repository for keras.",
+                    "github_created_at": "2016-08-11T22:58:42Z",
+                    "github_created_at_delta": "2251 days, 0:00:00 days",
+                    "github_updated_at": "2021-12-17T03:07:29Z",
+                    "github_updated_at_delta": "297 days, 0:00:00 days",
+                    "github_subscribers_count": 7,
+                    "github_stargazers_count": 5,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 3,
+                    "github_open_issues": 3,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 27,
+                    "github_forks": 27,
+                    "github_commits_max_30": 30
+                }
+            }
+        },
+        "libssh2": {
+            "stackoverflow_package": "libssh2",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=libssh2&site=stackoverflow",
+            "stackoverflow_name": "libssh2",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 281,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "libssh2",
+                    "pypi_header": "Info about libssh2",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "",
+                    "pypi_info_requires_python": null,
+                    "pypi_info_requires_dist": "None",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {
+                "github_page_condaforge_repo": {
+                    "github_api_url_repo": "https://api.github.com/repos/conda-forge/libssh2-feedstock",
+                    "github_api_status": "success",
+                    "github_package": "libssh2-feedstock",
+                    "github_header": "Info about libssh2-feedstock",
+                    "github_description": "A conda-smithy repository for libssh2.",
+                    "github_created_at": "2016-10-19T02:56:41Z",
+                    "github_created_at_delta": "2182 days, 0:00:00 days",
+                    "github_updated_at": "2021-12-17T03:13:36Z",
+                    "github_updated_at_delta": "297 days, 0:00:00 days",
+                    "github_subscribers_count": 8,
+                    "github_stargazers_count": 0,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 0,
+                    "github_open_issues": 0,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 14,
+                    "github_forks": 14,
+                    "github_commits_max_30": 30
+                },
+                "github_page_condaforge": {
+                    "github_api_url_repo": "https://api.github.com/repos/libssh2/libssh2",
+                    "github_api_status": "success",
+                    "github_package": "libssh2",
+                    "github_header": "Info about libssh2",
+                    "github_description": "the SSH library",
+                    "github_created_at": "2015-03-05T07:38:30Z",
+                    "github_created_at_delta": "2776 days, 0:00:00 days",
+                    "github_updated_at": "2022-10-10T19:04:59Z",
+                    "github_updated_at_delta": "0:00:00 days",
+                    "github_subscribers_count": 79,
+                    "github_stargazers_count": 1000,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 70,
+                    "github_open_issues": 70,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": true,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 467,
+                    "github_forks": 467,
+                    "github_commits_max_30": 30
+                }
+            }
+        },
+        "zope": {
+            "stackoverflow_package": "zope",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=zope&site=stackoverflow",
+            "stackoverflow_name": "zope",
+            "stackoverflow_has_synonyms": false,
+            "stackoverflow_count": 732,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "zope",
+                    "pypi_header": "Info about zope",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "Zope application server / web framework",
+                    "pypi_info_requires_python": ">= 3.6",
+                    "pypi_info_requires_dist": "['AccessControl (>=5.2)', 'Acquisition', 'BTrees', 'Chameleon (>=3.7.0)', 'DateTime', 'DocumentTemplate (>=4.0)', 'ExtensionClass', 'MultiMapping', 'PasteDeploy', 'Persistence', 'RestrictedPython', 'ZConfig (>=2.9.2)', 'ZODB', 'setuptools (>=36.2)', 'transaction (>=2.4)', 'waitress', 'zExceptions (>=3.4)', 'z3c.pt', 'zope.browser', 'zope.browsermenu', 'zope.browserpage (>=4.4.0.dev0)', 'zope.browserresource (>=3.11)', 'zope.component', 'zope.configuration', 'zope.container', 'zope.contentprovider', 'zope.contenttype', 'zope.datetime', 'zope.deferredimport', 'zope.event', 'zope.exceptions', 'zope.globalrequest', 'zope.i18n[zcml]', 'zope.i18nmessageid', 'zope.interface (>=3.8)', 'zope.lifecycleevent', 'zope.location', 'zope.pagetemplate (>=4.0.2)', 'zope.processlifetime', 'zope.proxy', 'zope.ptresource', 'zope.publisher', 'zope.schema', 'zope.security', 'zope.sequencesort', 'zope.site', 'zope.size', 'zope.tal', 'zope.tales (>=5.0.2)', 'zope.testbrowser', 'zope.testing', 'zope.traversing', 'zope.viewlet', \"Sphinx ; extra == 'docs'\", \"sphinx-rtd-theme ; extra == 'docs'\", \"tempstorage ; extra == 'docs'\", \"Paste ; extra == 'wsgi'\"]",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {}
+        },
+        "fastjsonschema": {
+            "stackoverflow_package": "fastjsonschema",
+            "stackoverflow_api_status": "stackoverflow package returned no results",
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "fastjsonschema",
+                    "pypi_header": "Info about fastjsonschema",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "Fastest Python implementation of JSON schema",
+                    "pypi_info_requires_python": null,
+                    "pypi_info_requires_dist": "None",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {
+                "github_page_pypi": {
+                    "github_api_url_repo": "https://api.github.com/repos/horejsek/python-fastjsonschema",
+                    "github_api_status": "success",
+                    "github_package": "python-fastjsonschema",
+                    "github_header": "Info about python-fastjsonschema",
+                    "github_description": "Fast JSON schema validator for Python.",
+                    "github_created_at": "2016-09-29T20:16:31Z",
+                    "github_created_at_delta": "2202 days, 0:00:00 days",
+                    "github_updated_at": "2022-10-04T04:14:29Z",
+                    "github_updated_at_delta": "6 days, 0:00:00 days",
+                    "github_subscribers_count": 19,
+                    "github_stargazers_count": 357,
+                    "github_has_issues": true,
+                    "github_open_issues_count": 11,
+                    "github_open_issues": 11,
+                    "github_has_projects": true,
+                    "github_has_downloads": true,
+                    "github_has_wiki": false,
+                    "github_allow_forking": true,
+                    "github_fork": false,
+                    "github_forks_count": 50,
+                    "github_forks": 50,
+                    "github_commits_max_30": 30
+                }
+            }
+        },
+        "msgpack": {
+            "stackoverflow_package": "msgpack",
+            "stackoverflow_api_status": "success",
+            "stackoverflow_api_call": "https://api.stackexchange.com/2.3/tags?inname=msgpack&site=stackoverflow",
+            "stackoverflow_name": "msgpack",
+            "stackoverflow_has_synonyms": true,
+            "stackoverflow_count": 384,
+            "pypi": {
+                "pypi": {
+                    "pypi_package": "msgpack",
+                    "pypi_header": "Info about msgpack",
+                    "pypi_api_status": "success",
+                    "pypi_info_summary": "MessagePack serializer",
+                    "pypi_info_requires_python": "",
+                    "pypi_info_requires_dist": "None",
+                    "pypi_info_yanked": false,
+                    "pypi_vulnerabilities": []
+                }
+            },
+            "github": {}
+        }
+    }
+}
